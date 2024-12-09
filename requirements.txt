@@ -4,3 +4,5 @@ postgres
 pydantic
 sqlalchemy
 psycopg2-binary
+pydantic[email]
+pydantic-settings
