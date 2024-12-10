@@ -1,15 +1,15 @@
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
-from fastapi import status
-from fastapi import APIRouter
-app = FastAPI()
-router = APIRouter(
-    prefix="/home"
-)
 
-@router.post("/getStart")
-def start():
-    return JSONResponse(
-        status_code=status.HTTP_200_OK,
-        content={"message":"Run"}
-    )
+from database import engine
+from api import router
+from db import tables
+async def init_db():
+    async with engine.begin() as conn:
+        await conn.run_sync(tables.Base.metadata.create_all)
+app = FastAPI()
+
+@app.on_event("startup")
+async def startup_event():
+    await init_db()
+
+app.include_router(router)
