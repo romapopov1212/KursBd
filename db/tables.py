@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, Text, ForeignKey, Numeric
 from sqlalchemy.orm import declarative_base
 
 
@@ -9,13 +9,13 @@ class Purchase(Base):
     id_purchase = Column(Integer, primary_key=True, index=True)
     buyer_number = Column(String, unique=True)
     date = Column(String)
-    full_price = Column(Integer)
+    full_price = Column(Numeric)
 
 class Products(Base):
     __tablename__ = "Products"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
-    price = Column(Integer)
+    price = Column(Numeric)
 
 
 class PurchasedProducts(Base):

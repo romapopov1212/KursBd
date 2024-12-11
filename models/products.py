@@ -1,4 +1,5 @@
 from pydantic import BaseModel
 
 class Product(BaseModel):
-    pass
+    name: str
+    price: float
