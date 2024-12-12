@@ -43,11 +43,11 @@ class ProductsService:
     ):
         prod = await self.get_product(product_id)
         # old_prod = deepcopy(prod)
-        # if prod in None:
-        #     return HTTPException(
-        #         status_code=status.HTTP_404_NOT_FOUND,
-        #         detail=f"Товар не найден"
-        #     )
+        if prod is None:
+            return HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Товар не найден"
+            )
         for field, value in vars(new_data).items():
             setattr(prod, field, value)
         await self.session.commit()
@@ -56,20 +56,12 @@ class ProductsService:
             content={"message" : f"Товар '{prod.name}' изменен"}
         )
 
-    # async def get_product_by_name(
-    #         self,
-    #         name:str
-    # ) -> tables.Products:
-    #     prod = select(tables.Products).filter(tables.Products.name==name)
-    #     result = await self.session.execute(prod)
-    #     product_by_name = result.scalars().first()
-    #     return product_by_name
 
     async def get_product(
             self,
             anything,
     ) -> tables.Products:
-        prod = select(tables.Products).filter(tables.Products.id==anything).first()
+        prod = select(tables.Products).filter(tables.Products.id==anything)
         result = await self.session.execute(prod)
         product_by_id = result.scalars().first()
         return product_by_id

@@ -7,7 +7,7 @@ Base = declarative_base()
 class Purchase(Base):
     __tablename__ = "Purchase"
     id_purchase = Column(Integer, primary_key=True, index=True)
-    buyer_number = Column(String, unique=True)
+    buyer_number = Column(String, ForeignKey('Buyers.telephone_number'), primary_key=True)
     date = Column(String)
     full_price = Column(Numeric)
 
@@ -16,6 +16,7 @@ class Products(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
     price = Column(Numeric)
+    count = Column(Integer)
 
 
 class PurchasedProducts(Base):
