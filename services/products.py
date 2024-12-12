@@ -1,8 +1,9 @@
 from copy import deepcopy
+from wsgiref.util import request_uri
 
 from fastapi import HTTPException
-from itertools import product
 
+from typing import List
 from sqlalchemy.orm import Session
 from fastapi import Depends
 from fastapi.responses import JSONResponse
@@ -42,7 +43,6 @@ class ProductsService:
             new_data: Product
     ):
         prod = await self.get_product(product_id)
-        # old_prod = deepcopy(prod)
         if prod is None:
             return HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -56,6 +56,17 @@ class ProductsService:
             content={"message" : f"Товар '{prod.name}' изменен"}
         )
 
+    async def get_list(self) -> List[tables.Products]:
+        stmt = select(tables.Products)
+        result = await self.session.execute(stmt)
+        prod = result.scalars().all()
+
+        if prod is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Список продуктов пуст",
+            )
+        return prod
 
     async def get_product(
             self,

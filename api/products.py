@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from fastapi import Depends
+from sqlalchemy.util import await_only
 
 from services.products import ProductsService
 from models.products import Product
@@ -21,3 +22,9 @@ async def update_product(
         service: ProductsService=Depends(),
 ):
     return await service.update_product(product_id, new_product_data)
+
+@router.get("/list")
+async def get_products(
+        service: ProductsService=Depends(),
+):
+    return await service.get_list()
