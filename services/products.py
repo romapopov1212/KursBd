@@ -43,11 +43,6 @@ class ProductsService:
             new_data: Product
     ):
         prod = await self.get_product(product_id)
-        if prod is None:
-            return HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Товар не найден"
-            )
         for field, value in vars(new_data).items():
             setattr(prod, field, value)
         await self.session.commit()
@@ -64,16 +59,37 @@ class ProductsService:
         if prod is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Список продуктов пуст",
+                detail="Список продуктов пуст"
             )
         return prod
 
+    async def get_product_by_name(
+            self,
+            name: str
+    ):
+        stmt = select(tables.Products).filter(tables.Products.name == name)
+        result = await self.session.execute(stmt)
+        product_by_name = result.scalars().first()
+        if product_by_name is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail= f"Продукт '{name}' не найден"
+            )
+
+        return product_by_name
+
+
     async def get_product(
             self,
-            anything,
+            product_id,
     ) -> tables.Products:
-        prod = select(tables.Products).filter(tables.Products.id==anything)
+        prod = select(tables.Products).filter(tables.Products.id==product_id)
         result = await self.session.execute(prod)
         product_by_id = result.scalars().first()
+        if product_by_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail= f"Продукт с id: {product_id} не найден"
+            )
         return product_by_id
 
