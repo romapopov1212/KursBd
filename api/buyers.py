@@ -7,7 +7,7 @@ router = APIRouter(
     prefix="/shop/buyers"
 )
 
-@router.post("/add")
+@router.post("/buyer/add")
 async def add_buyer(
         buyer_data: Buyers,
         service: BuyersService=Depends(),
@@ -20,3 +20,7 @@ async def delete(
         service: BuyersService=Depends(),
 ):
     return await service.delete(buyer_number)
+
+@router.get("/all")
+async def get_all_buyers(service:BuyersService=Depends()):
+    return await service.get_list()

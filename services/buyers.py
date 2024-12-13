@@ -1,4 +1,5 @@
 from fastapi import Depends, HTTPException
+from typing import List
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 from fastapi import status
@@ -43,6 +44,19 @@ class BuyersService:
             status_code=status.HTTP_200_OK,
             content={"message": f"Покупатель удален"}
         )
+
+    async def get_list(
+            self,
+    ) -> List[tables.Buyers]:
+        stmt = select(tables.Buyers)
+        result = await self.session.execute(stmt)
+        buyers = result.scalars().all()
+        if buyers is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail= "Список покупателей пуст"
+            )
+        return buyers
 
     async def get_buyer_by_number(
             self,
