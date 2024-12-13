@@ -13,3 +13,10 @@ async def add_buyer(
         service: BuyersService=Depends(),
 ):
     return await service.add_buyers(buyer_data)
+
+@router.delete("/buyer/delete")
+async def delete(
+        buyer_number: str,
+        service: BuyersService=Depends(),
+):
+    return await service.delete(buyer_number)
