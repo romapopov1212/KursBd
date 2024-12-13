@@ -29,9 +29,23 @@ async def get_products(
 ):
     return await service.get_list()
 
-@router.get("/get_product/{product_name}")
+@router.get("/product/{product_name}")
 async def get_product(
         product_name: str,
         service: ProductsService=Depends(),
 ):
     return await service.get_product_by_name(product_name)
+
+@router.get("/product_by_id/{product_id}")
+async def get_product_by_id(
+        product_id: int,
+        service: ProductsService=Depends(),
+):
+    return await service.get_product_by_id(product_id)
+
+@router.delete("/delete_product/{product_id}")
+async def delete_product(
+        product_id: int,
+        service: ProductsService=Depends(),
+):
+    return await service.delete(product_id)

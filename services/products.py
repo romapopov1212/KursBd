@@ -28,7 +28,8 @@ class ProductsService:
     ):
         prod = tables.Products(
             name = product_data.name,
-            price = product_data.price
+            price = product_data.price,
+            count=product_data.count
         )
         self.session.add(prod)
         await self.session.commit()
@@ -42,7 +43,7 @@ class ProductsService:
             product_id,
             new_data: Product
     ):
-        prod = await self.get_product(product_id)
+        prod = await self.get_product_by_id(product_id)
         for field, value in vars(new_data).items():
             setattr(prod, field, value)
         await self.session.commit()
@@ -79,9 +80,9 @@ class ProductsService:
         return product_by_name
 
 
-    async def get_product(
+    async def get_product_by_id(
             self,
-            product_id,
+            product_id: int
     ) -> tables.Products:
         prod = select(tables.Products).filter(tables.Products.id==product_id)
         result = await self.session.execute(prod)
@@ -92,4 +93,19 @@ class ProductsService:
                 detail= f"Продукт с id: {product_id} не найден"
             )
         return product_by_id
+
+    async def delete(
+            self,
+            product_id
+    ):
+        prod = await self.get_product_by_id(product_id)
+
+        await self.session.delete(prod)
+        await self.session.commit()
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={"message": f"Товар удален"}
+        )
+
+
 
