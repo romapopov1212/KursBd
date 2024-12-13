@@ -20,6 +20,14 @@ class BuyersService:
             self,
             buyers_data: Buyers,
     ):
+        stmt = select(tables.Buyers).filter(tables.Buyers.telephone_number == buyers_data.telephone_number)
+        result = await self.session.execute(stmt)
+        buyer_by_number = result.scalars().first()
+        if buyer_by_number is not None:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Пользователь с таким номером уже существует"
+            )
         buyer = tables.Buyers(
             telephone_number = buyers_data.telephone_number,
             name = buyers_data.firstname,
@@ -30,7 +38,7 @@ class BuyersService:
         await self.session.commit()
         return JSONResponse(
             status_code=status.HTTP_200_OK,
-            content={"message": f"Пользователь {buyers_data.firstname} добавлен"}
+            content={"message": f"Покупатель {buyers_data.firstname} добавлен"}
         )
 
     async def delete(
