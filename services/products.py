@@ -1,8 +1,4 @@
-from copy import deepcopy
-from wsgiref.util import request_uri
-
 from fastapi import HTTPException
-
 from typing import List
 from sqlalchemy.orm import Session
 from fastapi import Depends
