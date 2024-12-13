@@ -94,7 +94,7 @@ class ProductsService:
             )
         return product_by_id
 
-    async def delete(
+    async def delete_by_id(
             self,
             product_id
     ):
@@ -107,5 +107,17 @@ class ProductsService:
             content={"message": f"Товар удален"}
         )
 
+    async def delete_by_name(
+            self,
+            product_name: str,
+    ):
+        prod = await self.get_product_by_name(product_name)
+
+        await self.session.delete(prod)
+        await self.session.commit()
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={"message": f"Товар удален"}
+        )
 
 
