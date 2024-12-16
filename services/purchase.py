@@ -1,3 +1,4 @@
+#нужно добавить просмотр всех покупок а также сделать разграничения действий
 from sqlalchemy.orm import Session
 from fastapi import Depends
 from typing import List
@@ -7,9 +8,10 @@ from fastapi import status
 from datetime import datetime
 from services.products import ProductsService
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.future import select
 
 from database import get_session
-from models.purchase import PurchaseProduct, Purchase
+from models.purchase import PurchaseProduct
 from db import tables
 
 class PurchaseService:
@@ -48,25 +50,20 @@ class PurchaseService:
         for item in products_to_buy:
             product_id = item.product_id
             count_to_buy = item.count
-
             product = await self.service.get_product_by_id(product_id)
             if product.count < count_to_buy:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=f"Недостаточно товара '{product.name}' на складе. Доступно: {product.count}, запрошено: {count_to_buy}."
                 )
-
             product.count -= count_to_buy
-
             purchased_product = tables.PurchasedProducts(
                 id_purchase=purchase.id_purchase,
                 id_product=product_id,
                 count=count_to_buy
             )
             self.session.add(purchased_product)
-
             total_price += product.price * count_to_buy
-
             purchased_items.append({
                 "product_name": product.name,
                 "count": count_to_buy,
@@ -94,3 +91,15 @@ class PurchaseService:
                 "purchased_items": purchased_items
             }
         )
+
+    async def get_list(self) -> List[tables.Purchase]:
+        stmt = select(tables.Purchase)
+        result = await self.session.execute(stmt)
+        pur = result.scalars().all()
+
+        if pur is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Список покупок пуст."
+            )
+        return pur

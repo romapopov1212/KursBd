@@ -16,3 +16,9 @@ async def create_purchase(
         buyer_number=purchase.buyer_number,
         products_to_buy=purchase.products
     )
+
+@router.get("/all")
+async def get_all_purchase(
+        service: PurchaseService = Depends(),
+):
+    return await service.get_list()
