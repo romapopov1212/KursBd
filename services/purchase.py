@@ -106,6 +106,11 @@ class PurchaseService:
 
     async def delete_purchase_by_id(self, purchase_id: int):
         purchase = await self.session.get(tables.Purchase, purchase_id)
+        if purchase is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Нет покупки с таким id"
+            )
         stmt = select(tables.PurchasedProducts).where(tables.PurchasedProducts.id_purchase == purchase_id)
         result = await self.session.execute(stmt)
         purchased_products = result.scalars().all()
