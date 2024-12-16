@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends
 
 from models.purchase import Purchase
 from services.purchase import PurchaseService
+
+
 router = APIRouter(
     prefix="/shop/purchases"
 )
@@ -17,11 +19,13 @@ async def create_purchase(
         products_to_buy=purchase.products
     )
 
+
 @router.get("/all")
 async def get_all_purchase(
         service: PurchaseService = Depends(),
 ):
     return await service.get_list()
+
 
 @router.post("/purchase/delete_by_id/{purchase_id}")
 async def del_purchase(

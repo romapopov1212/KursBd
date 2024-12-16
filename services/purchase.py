@@ -109,7 +109,7 @@ class PurchaseService:
         if purchase is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Нет покупки с таким id"
+                detail=f"Нет покупки с id: {purchase_id}"
             )
         stmt = select(tables.PurchasedProducts).where(tables.PurchasedProducts.id_purchase == purchase_id)
         result = await self.session.execute(stmt)

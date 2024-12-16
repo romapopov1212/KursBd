@@ -24,6 +24,15 @@ class ProductsService:
             self,
             product_data: Product
     ):
+        prod_try_name = await self.get_product_by_name(product_data.name)
+        if prod_try_name:
+            prod_try_name.count += product_data.count
+            prod_try_name.price = product_data.price
+            await self.session.commit()
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={"message": f"Товар '{product_data.name}' обновлен"}
+            )
         prod = tables.Products(
             name = product_data.name,
             price = product_data.price,
