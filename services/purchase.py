@@ -116,7 +116,6 @@ class PurchaseService:
         purchased_products = result.scalars().all()
         for item in purchased_products:
             await self.session.delete(item)
-            await self.session.commit()
 
         await self.session.delete(purchase)
         await self.session.commit()
