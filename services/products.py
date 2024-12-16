@@ -80,7 +80,6 @@ class ProductsService:
 
         return product_by_name
 
-
     async def get_product_by_id(
             self,
             product_id: int
@@ -101,7 +100,6 @@ class ProductsService:
             product_id
     ):
         prod = await self.get_product_by_id(product_id)
-
         await self.session.delete(prod)
         await self.session.commit()
         return JSONResponse(

@@ -22,3 +22,11 @@ async def get_all_purchase(
         service: PurchaseService = Depends(),
 ):
     return await service.get_list()
+
+@router.post("/purchase/delete_by_id/{purchase_id}")
+async def del_purchase(
+        purchase_id: int,
+        service: PurchaseService = Depends(),
+
+):
+    return await service.delete_purchase_by_id(purchase_id)

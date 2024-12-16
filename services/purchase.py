@@ -1,4 +1,4 @@
-#нужно добавить просмотр всех покупок а также сделать разграничения действий
+#также сделать разграничения действий
 from sqlalchemy.orm import Session
 from fastapi import Depends
 from typing import List
@@ -103,3 +103,20 @@ class PurchaseService:
                 detail="Список покупок пуст."
             )
         return pur
+
+    async def delete_purchase_by_id(self, purchase_id: int):
+        purchase = await self.session.get(tables.Purchase, purchase_id)
+        stmt = select(tables.PurchasedProducts).where(tables.PurchasedProducts.id_purchase == purchase_id)
+        result = await self.session.execute(stmt)
+        purchased_products = result.scalars().all()
+        for item in purchased_products:
+            await self.session.delete(item)
+            await self.session.commit()
+
+        await self.session.delete(purchase)
+        await self.session.commit()
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={"message" : "Покупка удалена успешно."}
+        )
+
