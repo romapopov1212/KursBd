@@ -34,7 +34,7 @@ async def get_product(
         product_name: str,
         service: ProductsService=Depends(),
 ):
-    return await service.get_product_by_name(product_name)
+    return await service.get_by_name(product_name)
 
 @router.get("/product/id/{product_id}")
 async def get_product_by_id(

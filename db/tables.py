@@ -10,7 +10,7 @@ class Buyers(Base):
     name = Column(String)
     surname = Column(String)
     lastname = Column(String)
-
+   # is_admin = Column(Boolean)
     purchases = relationship("Purchase", back_populates="buyer")
 
 
@@ -39,6 +39,8 @@ class PurchasedProducts(Base):
     __tablename__ = "PurchasedProducts"
     id_purchase = Column(Integer, ForeignKey('Purchase.id_purchase'), primary_key=True)
     id_product = Column(Integer, ForeignKey('Products.id'), primary_key=True)
+    #нужно сделать именно составной ключ
+
     count = Column(Integer)
 
     purchase = relationship("Purchase", back_populates="purchased_products")
