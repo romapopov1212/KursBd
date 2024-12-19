@@ -4,26 +4,37 @@ from sqlalchemy.orm import Session
 from fastapi import Depends
 from fastapi.responses import JSONResponse
 from fastapi import status
+from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.future import select
+from services.admin_token import http_bearer
 
 from models.products import Product
 from database import get_session
 from db import tables
+from services.admin_token import AdminService
 
 
 class ProductsService:
 
     def __init__(
             self,
-            session: Session=Depends(get_session)
+            session: Session=Depends(get_session),
+            admin_service: AdminService = Depends(),
+
     ):
         self.session = session
-
-
+        self.admin_service = admin_service
     async def add_product(
             self,
-            product_data: Product
+            product_data: Product,
+            credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
     ):
+        current_user = self.admin_service.get_current_user(credentials)
+        if current_user != "admin":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Недостаточно прав для выполнения действия"
+            )
         prod_try_name = await self.get_product_by_name_helper(product_data.name)
         if prod_try_name:
             prod_try_name.count += product_data.count

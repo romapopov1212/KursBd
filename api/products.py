@@ -1,6 +1,8 @@
 from fastapi import APIRouter
 from fastapi import Depends
 from sqlalchemy.util import await_only
+from fastapi.security import HTTPAuthorizationCredentials
+from services.admin_token import http_bearer
 
 from services.products import ProductsService
 from models.products import Product
@@ -11,9 +13,10 @@ router = APIRouter(
 @router.post("/add_product")
 async def add_product(
         prod_data: Product,
-        service: ProductsService=Depends()
+        service: ProductsService=Depends(),
+        credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
 ):
-    return await service.add_product(prod_data)
+    return await service.add_product(prod_data, credentials)
 
 @router.patch("/update_product/{product_id}")
 async def update_product(

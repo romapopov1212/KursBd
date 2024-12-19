@@ -6,7 +6,8 @@ from fastapi.security import HTTPBearer
 from database import get_session
 from models.token import Token
 from fastapi import HTTPException, status
-from  datetime import timedelta, datetime
+from  datetime import timedelta, datetime, timezone
+from fastapi.security import HTTPAuthorizationCredentials
 
 http_bearer = HTTPBearer(auto_error=False)
 
@@ -41,15 +42,29 @@ class AdminService:
                 status_code= status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid admin login or password"
             )
-        access_token_expires = timedelta(minutes=40)
-        expiration_time = (datetime.utcnow() + access_token_expires).timestamp()
+        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
 
         access_token = self.create_access_token(
             data={
                 "sub": admin_email,
-                "exp": expiration_time
+                "exp": expire
             }
         )
         return Token(access_token=access_token)
+
+
+    def get_current_user(self, credentials:HTTPAuthorizationCredentials = Depends(http_bearer)):
+        if not credentials:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Требуется токен для выполнения действия"
+            )
+
+        token_data = self.decode_token(credentials.credentials)
+
+        res: str = token_data.get("sub")
+        return res
+
+
 
 
