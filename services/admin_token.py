@@ -21,7 +21,6 @@ class AdminService:
     @staticmethod
     def create_access_token(
             data: dict,
-            #expires_delta: timedelta | None = None
     ):
         to_encode = data.copy()
         encoded_jwt = jwt.encode(to_encode, settings.jwt_secret, algorithm=settings.jwt_algorithm)
@@ -40,7 +39,7 @@ class AdminService:
         if admin_email != settings.admin_name or admin_password != settings.admin_password:
             raise HTTPException(
                 status_code= status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid admin login or password"
+                detail="Неверный логин или пароль админа"
             )
         expire = datetime.now(timezone.utc) + timedelta(minutes=15)
 

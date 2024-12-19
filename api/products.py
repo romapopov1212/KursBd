@@ -23,8 +23,9 @@ async def update_product(
         product_id:int,
         new_product_data: Product,
         service: ProductsService=Depends(),
+        credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
 ):
-    return await service.update_product(product_id, new_product_data)
+    return await service.update_product(product_id, new_product_data, credentials)
 
 @router.get("/list")
 async def get_products(
@@ -50,12 +51,14 @@ async def get_product_by_id(
 async def delete_product_by_id(
         product_id: int,
         service: ProductsService=Depends(),
+        credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
 ):
-    return await service.delete_by_id(product_id)
+    return await service.delete_by_id(product_id, credentials)
 
 @router.delete("/delete_product/name/{product_name}")
 async def delete_product_by_name(
         product_name: str,
         service: ProductsService=Depends(),
+        credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
 ):
-    return await service.delete_by_name(product_name)
+    return await service.delete_by_name(product_name, credentials)

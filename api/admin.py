@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from services.admin_token import AdminService
 router = APIRouter(
-    prefix="/admin"
+    prefix="/shop/admin"
 )
 
 @router.post("/login")

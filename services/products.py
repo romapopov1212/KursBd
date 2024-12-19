@@ -60,8 +60,15 @@ class ProductsService:
     async def update_product(
             self,
             product_id,
-            new_data: Product
+            new_data: Product,
+            credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
     ):
+        current_user = self.admin_service.get_current_user(credentials)
+        if current_user != "admin":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Недостаточно прав для выполнения действия"
+            )
         prod = await self.get_product_by_id(product_id)
         for field, value in vars(new_data).items():
             setattr(prod, field, value)
@@ -106,6 +113,8 @@ class ProductsService:
                 detail=f"Товар с именем {name} не найден"
             )
         return res
+
+
     async def get_product_by_id(
             self,
             product_id: int
@@ -123,8 +132,15 @@ class ProductsService:
 
     async def delete_by_id(
             self,
-            product_id
+            product_id,
+            credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
     ):
+        current_user = self.admin_service.get_current_user(credentials)
+        if current_user != "admin":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Недостаточно прав для выполнения действия"
+            )
         prod = await self.get_product_by_id(product_id)
         await self.session.delete(prod)
         await self.session.commit()
@@ -137,7 +153,14 @@ class ProductsService:
     async def delete_by_name(
             self,
             product_name: str,
+            credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
     ):
+        current_user = self.admin_service.get_current_user(credentials)
+        if current_user != "admin":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Недостаточно прав для выполнения действия"
+            )
         prod = await self.get_product_by_name_helper(product_name)
         if prod is None:
             raise HTTPException(
