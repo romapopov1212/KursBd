@@ -8,3 +8,4 @@ pydantic[email]
 pydantic-settings
 asyncpg
 alembic
+pyjwt
