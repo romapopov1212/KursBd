@@ -4,7 +4,9 @@ from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 from fastapi import status
 from sqlalchemy.future import select
+from fastapi.security import HTTPAuthorizationCredentials
 
+from services.admin_token import AdminService, http_bearer
 from db import tables
 from database import get_session
 from models.buyers import Buyers
@@ -12,14 +14,34 @@ from models.buyers import Buyers
 class BuyersService:
     def __init__(
             self,
-            session: Session = Depends(get_session)
+            session: Session = Depends(get_session),
+            admin_service: AdminService = Depends()
     ):
         self.session = session
+        self.admin_service = admin_service
+
+    # def exept_admin(
+    #         self,
+    #         credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
+    # ):
+    #     current_user = self.admin_service.get_current_user(credentials)
+    #     if current_user != "admin":
+    #         raise HTTPException(
+    #             status_code=status.HTTP_403_FORBIDDEN,
+    #             detail="Недостаточно прав для выполнения действия"
+    #         )
 
     async def add_buyers(
             self,
             buyers_data: Buyers,
+            credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
     ):
+        current_user = self.admin_service.get_current_user(credentials)
+        if current_user != "admin":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Недостаточно прав для выполнения действия"
+            )
         stmt = select(tables.Buyers).filter(tables.Buyers.telephone_number == buyers_data.telephone_number)
         result = await self.session.execute(stmt)
         buyer_by_number = result.scalars().first()
@@ -44,7 +66,14 @@ class BuyersService:
     async def delete(
             self,
             buyer_number,
+            credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
     ):
+        current_user = self.admin_service.get_current_user(credentials)
+        if current_user != "admin":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Недостаточно прав для выполнения действия"
+            )
         buyer_for_delete = await self.get_buyer_by_number(buyer_number)
         await self.session.delete(buyer_for_delete)
         await self.session.commit()
@@ -55,7 +84,15 @@ class BuyersService:
 
     async def get_list(
             self,
+            credentials: HTTPAuthorizationCredentials=Depends()
     ) -> List[tables.Buyers]:
+
+        current_user = self.admin_service.get_current_user(credentials)
+        if current_user != "admin":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Недостаточно прав для выполнения действия"
+            )
         stmt = select(tables.Buyers)
         result = await self.session.execute(stmt)
         buyers = result.scalars().all()
@@ -69,7 +106,14 @@ class BuyersService:
     async def get_buyer_by_number(
             self,
             number: str,
+            credentials: HTTPAuthorizationCredentials=Depends()
     ):
+        current_user = self.admin_service.get_current_user(credentials)
+        if current_user != "admin":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Недостаточно прав для выполнения действия"
+            )
         stmt = select(tables.Buyers).filter(tables.Buyers.telephone_number == number)
         result = await self.session.execute(stmt)
         buyer_by_number = result.scalars().first()

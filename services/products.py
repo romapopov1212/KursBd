@@ -24,6 +24,19 @@ class ProductsService:
     ):
         self.session = session
         self.admin_service = admin_service
+
+    def exept_admin(
+            self,
+            credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
+    ):
+        current_user = self.admin_service.get_current_user(credentials)
+        if current_user != "admin":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Недостаточно прав для выполнения действия"
+            )
+
+
     async def add_product(
             self,
             product_data: Product,

@@ -1,4 +1,3 @@
-#также сделать разграничения действий
 from sqlalchemy.orm import Session
 from fastapi import Depends
 from typing import List
@@ -9,7 +8,9 @@ from datetime import datetime
 from services.products import ProductsService
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.future import select
+from fastapi.security import HTTPAuthorizationCredentials
 
+from services.buyers import http_bearer, AdminService
 from database import get_session
 from models.purchase import PurchaseProduct
 from db import tables
@@ -18,17 +19,25 @@ class PurchaseService:
     def __init__(
             self,
             session: Session = Depends(get_session),
-            service: ProductsService = Depends()
+            service: ProductsService = Depends(),
+            admin_service: AdminService = Depends()
     ):
         self.session = session
         self.service = service
-
+        self.admin_service = admin_service
 
     async def make_purchase(
             self,
             buyer_number: str,
-            products_to_buy: List[PurchaseProduct]
+            products_to_buy: List[PurchaseProduct],
+            credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
     ):
+        current_user = self.admin_service.get_current_user(credentials)
+        if current_user != "admin":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Недостаточно прав для выполнения действия"
+            )
         buyer = await self.session.get(tables.Buyers, buyer_number)
         if not buyer:
             raise HTTPException(
@@ -92,7 +101,17 @@ class PurchaseService:
             }
         )
 
-    async def get_list(self) -> List[tables.Purchase]:
+    async def get_list(
+            self,
+            credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
+    ) -> List[tables.Purchase]:
+
+        current_user = self.admin_service.get_current_user(credentials)
+        if current_user != "admin":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Недостаточно прав для выполнения действия"
+            )
         stmt = select(tables.Purchase)
         result = await self.session.execute(stmt)
         pur = result.scalars().all()
@@ -104,7 +123,19 @@ class PurchaseService:
             )
         return pur
 
-    async def delete_purchase_by_id(self, purchase_id: int):
+    async def delete_purchase_by_id(
+            self,
+            purchase_id: int,
+            credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
+    ):
+
+        current_user = self.admin_service.get_current_user(credentials)
+        if current_user != "admin":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Недостаточно прав для выполнения действия"
+            )
+
         purchase = await self.session.get(tables.Purchase, purchase_id)
         if purchase is None:
             raise HTTPException(

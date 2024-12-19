@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 from fastapi import Depends
-from sqlalchemy.util import await_only
 from fastapi.security import HTTPAuthorizationCredentials
 from services.admin_token import http_bearer
 

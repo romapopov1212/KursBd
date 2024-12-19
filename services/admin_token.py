@@ -56,7 +56,7 @@ class AdminService:
         if not credentials:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Требуется токен для выполнения действия"
+                detail="Нет прав для выполнения действия"
             )
 
         token_data = self.decode_token(credentials.credentials)
