@@ -1,6 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean, Text, ForeignKey, Numeric
 from sqlalchemy.orm import declarative_base, relationship
-
 Base = declarative_base()
 
 
@@ -45,3 +44,4 @@ class PurchasedProducts(Base):
 
     purchase = relationship("Purchase", back_populates="purchased_products")
     product = relationship("Products", back_populates="purchased_products")
+
