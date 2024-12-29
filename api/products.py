@@ -6,7 +6,8 @@ from services.admin_token import http_bearer
 from services.products import ProductsService
 from models.products import Product
 router = APIRouter(
-    prefix="/shop/products"
+    prefix="/shop/products",
+    tags=['products']
 )
 
 @router.post("/add_product")

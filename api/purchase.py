@@ -7,7 +7,8 @@ from services.admin_token import http_bearer
 
 
 router = APIRouter(
-    prefix="/shop/purchases"
+    prefix="/shop/purchases",
+    tags=['purchase']
 )
 
 

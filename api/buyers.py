@@ -7,7 +7,8 @@ from models.buyers import Buyers
 from services.buyers import BuyersService
 
 router = APIRouter(
-    prefix="/shop/buyers"
+    prefix="/shop/buyers",
+    tags=['buyers']
 )
 
 @router.post("/buyer/add")

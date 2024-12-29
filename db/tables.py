@@ -38,10 +38,9 @@ class PurchasedProducts(Base):
     __tablename__ = "PurchasedProducts"
     id_purchase = Column(Integer, ForeignKey('Purchase.id_purchase'), primary_key=True)
     id_product = Column(Integer, ForeignKey('Products.id'), primary_key=True)
-    #нужно сделать именно составной ключ
 
     count = Column(Integer)
 
     purchase = relationship("Purchase", back_populates="purchased_products")
     product = relationship("Products", back_populates="purchased_products")
-
+    
