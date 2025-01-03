@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Магазин</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script src="/static/script.js"></script>
+</head>
+
+<body class="bg-light d-lg-grid">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10 p-md-0">
+                <h1 class="text-center mb-4">Выберите продукты</h1>
+                <table class="table table-striped text-center">
+                    <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Цена</th>
+                            <th>Количество</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>{{ product.name }}</td>
+                            <td>{{ product.price }}</td>
+                            <td>{{ product.quantity }}</td>
+                            <td>
+                                <form class="d-grid row align-items-center pick_quantity_form">
+                                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                                    <div class="m-md-1 w-50">
+                                        <input type="number" class="form-control quantity" name="quantity" min="1" max="{{ product.quantity }}" required>
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="text-center mt-3">
+                    <button type="button" class="btn btn-primary" id="order_button">Оформить заказ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            checkUser();
+        });
+        $(document).ready(function() {
+            $('#order_button').on('click', function() {
+
+                $('.pick_quantity_form').each(function() {
+                    const quantityInput = $(this).find('input[name="quantity"]');
+                    const quantityValue = parseInt(quantityInput.val());
+                    const maxQuantity = parseInt(quantityInput.attr('max'));
+                    const productName = $(this).closest('tr').find('td:nth-child(1)').text();
+
+                    if (quantityValue > maxQuantity) {
+                        alert(`Пожалуйста, введите корректное количество для продукта ${productName}`);
+                        return
+                    }
+
+                });
+                click_order_button();
+            });
+        })
+    </script>
+</body>
+</html>

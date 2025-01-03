@@ -1,10 +1,17 @@
 from fastapi import APIRouter
-from fastapi import Depends
+from fastapi import Depends, Request
 from fastapi.security import HTTPAuthorizationCredentials
-from services.admin_token import http_bearer
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
 
+from services.admin_token import http_bearer
 from services.products import ProductsService
 from models.products import Product
+
+
+
+templates = Jinja2Templates(directory="templates")
+
 router = APIRouter(
     prefix="/shop/products",
     tags=['products']
@@ -26,6 +33,14 @@ async def update_product(
         credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
 ):
     return await service.update_product(product_id, new_product_data, credentials)
+
+@router.get("/products_page", response_class=HTMLResponse)
+async def get_page(
+        request: Request,
+        service: ProductsService = Depends()
+):
+    prod = await service.get_list()
+    return templates.TemplateResponse("index.html", {"request": request, "products": prod})
 
 @router.get("/list")
 async def get_products(

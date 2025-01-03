@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from typing import List
 from sqlalchemy.orm import Session
-from fastapi import Depends
+from fastapi import Depends, Request
 from fastapi.responses import JSONResponse
 from fastapi import status
 from fastapi.security import HTTPAuthorizationCredentials
@@ -35,8 +35,8 @@ class ProductsService:
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Недостаточно прав для выполнения действия"
             )
-
-
+    
+    
     async def add_product(
             self,
             product_data: Product,
@@ -153,6 +153,15 @@ class ProductsService:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Недостаточно прав для выполнения действия"
+            )
+        search_in_purchase = select(tables.PurchasedProducts).filter(tables.PurchasedProducts.id_product == product_id)
+        if search_in_purchase is not None:
+            prod = await self.get_product_by_id(product_id)
+            prod.count = 0
+            await self.session.commit()
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={"message" : f"Товар содержится в заказе, поэтому его нельзя удалить полностью, его кол-во = 0"}
             )
         prod = await self.get_product_by_id(product_id)
         await self.session.delete(prod)
