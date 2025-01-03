@@ -192,6 +192,17 @@ class ProductsService:
                         status_code=status.HTTP_404_NOT_FOUND,
                         detail= f"Продукт '{product_name}' не найден"
                     )
+        search_in_purchase = await self.session.execute(
+            select(tables.PurchasedProducts).where(tables.PurchasedProducts.id_product == prod.id)
+        )
+        if search_in_purchase.scalars().first():
+            prod.count = 0
+            await self.session.commit()
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={"message": f"Продукт '{product_name}' связан с заказом, поэтому вместо удаления его количество = 0"}
+            )
+
         await self.session.delete(prod)
         await self.session.commit()
         return JSONResponse(
