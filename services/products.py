@@ -154,8 +154,11 @@ class ProductsService:
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Недостаточно прав для выполнения действия"
             )
-        search_in_purchase = select(tables.PurchasedProducts).filter(tables.PurchasedProducts.id_product == product_id)
-        if search_in_purchase is not None:
+        search_in_purchase = await self.session.execute(
+            select(tables.PurchasedProducts).where(tables.PurchasedProducts.id_product == product_id)
+        )
+
+        if search_in_purchase.scalars().first():
             prod = await self.get_product_by_id(product_id)
             prod.count = 0
             await self.session.commit()
