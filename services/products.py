@@ -92,17 +92,22 @@ class ProductsService:
         )
 
 
-    async def get_list(self) -> List[tables.Products]:
-        stmt = select(tables.Products)
+
+    async def get_list(self, page: int = 1, page_size: int = 5) -> List[tables.Products]:
+        offset = (page - 1) * page_size
+        
+        stmt = select(tables.Products).limit(page_size).offset(offset)
         result = await self.session.execute(stmt)
         prod = result.scalars().all()
 
-        if prod is None:
+        if not prod:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Список продуктов пуст"
             )
+        
         return prod
+
 
 
     async def get_product_by_name_helper(
