@@ -34,6 +34,7 @@ async def update_product(
 ):
     return await service.update_product(product_id, new_product_data, credentials)
 
+#для отрисовки страниц(потом надо куда нибудь переместить в отдельный файл)
 @router.get("/products_page", response_class=HTMLResponse)
 async def get_page(
         request: Request,
@@ -41,6 +42,16 @@ async def get_page(
 ):
     prod = await service.get_list()
     return templates.TemplateResponse("index.html", {"request": request, "products": prod})
+
+
+@router.get("/admin_page", response_class=HTMLResponse)
+async def get_admin_page(
+        request: Request,
+        service: ProductsService = Depends()
+):
+    prod = await service.get_list()
+    return templates.TemplateResponse("index_admin.html", {"request" : request, "products" : prod})
+
 
 @router.get("/list")
 async def get_products(
