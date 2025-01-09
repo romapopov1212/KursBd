@@ -122,6 +122,29 @@ class PurchaseService:
                 detail="Список покупок пуст."
             )
         return pur
+    
+
+    async def get_purchaseProduct_list(
+            self, 
+            credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
+    ) -> List[tables.PurchasedProducts]:
+        current_user = self.admin_service.get_current_user(credentials)
+        if current_user != "admin":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Недостаточно прав для выполнения действия"
+            )
+        stmt = select(tables.PurchasedProducts)
+        result = await self.session.execute(stmt)
+        purProd = result.scalars().all()
+
+        if purProd is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Список купленных продуктов пуст"
+            )
+        return purProd
+
 
     async def delete_purchase_by_id(
             self,

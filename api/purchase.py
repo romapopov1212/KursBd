@@ -31,6 +31,12 @@ async def get_all_purchase(
 ):
     return await service.get_list(credentials)
 
+@router.get("/allPurcashedProduct")
+async def get_all_purchaseProducts(
+        service: PurchaseService = Depends(),
+        credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
+):
+    return await service.get_purchaseProduct_list(credentials)
 
 @router.delete("/purchase/delete_by_id/{purchase_id}")
 async def del_purchase(
