@@ -4,14 +4,10 @@
     <meta charset="UTF-8">
     <title>Магазин</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
-    <script src="/static/main.js"></script>
 </head>
 
-<body class="bg-light d-lg-grid">
+<body class="bg-light">
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-10 p-md-0">
@@ -28,7 +24,6 @@
                             <th>Название</th>
                             <th>Цена</th>
                             <th>Количество</th>
-                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -44,33 +39,63 @@
                 </table>
             </div>
         </div>
-    </div>
 
-    <!-- Модальное окно для входа администратора -->
-    <div class="modal" tabindex="-1" role="dialog" id="adminLoginModal">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Вход администратора</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+        <!-- Поиск по названию -->
+        <div class="mb-4">
+            <h2>Поиск продукта по названию</h2>
+            <form id="searchByNameForm">
+                <div class="form-group">
+                    <label for="productName">Название продукта:</label>
+                    <input type="text" class="form-control" id="productName" placeholder="Введите название продукта">
                 </div>
-                <div class="modal-body">
-                    <form id="adminLoginForm">
-                        <div class="form-group">
-                            <label for="adminUsername">Логин</label>
-                            <input type="text" class="form-control" id="adminUsername" placeholder="Введите логин">
-                        </div>
-                        <div class="form-group">
-                            <label for="adminPassword">Пароль</label>
-                            <input type="password" class="form-control" id="adminPassword" placeholder="Введите пароль">
-                        </div>
-                    </form>
+                <button type="submit" class="btn btn-primary">Искать</button>
+            </form>
+        </div>
+
+        <!-- Поиск по ID -->
+        <div class="mb-4">
+            <h2>Поиск продукта по ID</h2>
+            <form id="searchByIdForm">
+                <div class="form-group">
+                    <label for="productId">ID продукта:</label>
+                    <input type="number" class="form-control" id="productId" placeholder="Введите ID продукта">
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" onclick="submitAdminLoginForm()">Войти</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                <button type="submit" class="btn btn-primary">Искать</button>
+            </form>
+        </div>
+
+        <!-- Результаты поиска -->
+        <div id="searchResults" class="mt-5">
+            <h3>Результаты поиска</h3>
+            <div id="resultsContainer" class="alert alert-info" style="display: none;"></div>
+        </div>
+
+        <!-- Модальное окно для входа администратора -->
+        <div class="modal" tabindex="-1" role="dialog" id="adminLoginModal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Вход администратора</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="adminLoginForm">
+                            <div class="form-group">
+                                <label for="adminUsername">Логин</label>
+                                <input type="text" class="form-control" id="adminUsername" placeholder="Введите логин">
+                            </div>
+                            <div class="form-group">
+                                <label for="adminPassword">Пароль</label>
+                                <input type="password" class="form-control" id="adminPassword" placeholder="Введите пароль">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="submitAdminLoginForm()">Войти</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -84,28 +109,64 @@
         }
 
         async function submitAdminLoginForm() {
-    const username = document.getElementById('adminUsername').value;
-    const password = document.getElementById('adminPassword').value;
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
 
-    try {
-        const response = await axios.post('/shop/admin/login', {
-            admin_name: username,
-            admin_password: password
+            try {
+                const response = await axios.post('/shop/admin/login', {
+                    admin_name: username,
+                    admin_password: password
+                });
+
+                if (response.data.access_token) {
+                    localStorage.setItem('adminToken', response.data.access_token);
+                    alert('Успешный вход! Токен сохранен.');
+                } else {
+                    alert('Ошибка входа: Невалидный ответ от сервера.');
+                }
+            } catch (error) {
+                const errorMessage = error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message;
+                alert(`Ошибка входа: ${errorMessage}`);
+            }
+        }
+
+        // Функция для отображения результатов
+        function displayResults(data) {
+            const resultsContainer = document.getElementById('resultsContainer');
+            resultsContainer.style.display = 'block';
+            resultsContainer.innerHTML = `
+                <p><strong>ID:</strong> ${data.id || 'N/A'}</p>
+                <p><strong>Название:</strong> ${data.name || 'N/A'}</p>
+                <p><strong>Цена:</strong> ${data.price || 'N/A'}</p>
+                <p><strong>Количество:</strong> ${data.count || 'N/A'}</p>
+            `;
+        }
+
+        // Поиск по названию
+        document.getElementById('searchByNameForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const productName = document.getElementById('productName').value;
+
+            try {
+                const response = await axios.get(`/shop/products/product/name/${productName}`);
+                displayResults(response.data);
+            } catch (error) {
+                alert('Ошибка поиска: ' + (error.response?.data?.detail || error.message));
+            }
         });
 
-        if (response.data.Token.access_token) {
-            localStorage.setItem('adminToken', response.data.access_token);
-            alert('Успешный вход! Токен сохранен.');
-            
-        } else {
-            alert('Ошибка входа: Невалидный ответ от сервера.');
-        }
-    } catch (error) {
-        // Извлечение сообщений об ошибке из сервера
-        const errorMessage = error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message;
-        alert(`Ошибка входа: ${errorMessage}`);
-    }
-}
+        // Поиск по ID
+        document.getElementById('searchByIdForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const productId = document.getElementById('productId').value;
+
+            try {
+                const response = await axios.get(`/shop/products/product/id/${productId}`);
+                displayResults(response.data);
+            } catch (error) {
+                alert('Ошибка поиска: ' + (error.response?.data?.detail || error.message));
+            }
+        });
     </script>
 </body>
 </html>

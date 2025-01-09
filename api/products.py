@@ -1,4 +1,5 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Form
+from pydantic import BaseModel
 from fastapi import Depends, Request
 from fastapi.security import HTTPAuthorizationCredentials
 from fastapi.templating import Jinja2Templates
@@ -16,6 +17,7 @@ router = APIRouter(
     prefix="/shop/products",
     tags=['products']
 )
+
 
 @router.post("/add_product")
 async def add_product(
