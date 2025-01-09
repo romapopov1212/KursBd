@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
-    <script src="/static/script.js"></script>
+    <script src="/static/main.js"></script>
 </head>
 
 <body class="bg-light d-lg-grid">
@@ -17,7 +17,7 @@
             <div class="col-md-10 p-md-0">
                 <!-- Верхний правый угол -->
                 <div class="d-flex justify-content-end mb-3">
-                    <a href="/admin-login" class="btn btn-primary">Войти как администратор</a>
+                    <a href="#" class="btn btn-primary" onclick="openAdminLoginForm(event)">Войти как администратор</a>
                 </div>
                 
                 <h1 class="text-center mb-4">Список всех продуктов</h1>
@@ -43,5 +43,67 @@
             </div>
         </div>
     </div>
+
+    <!-- Модальное окно для входа администратора -->
+    <div class="modal" tabindex="-1" role="dialog" id="adminLoginModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Вход администратора</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="adminLoginForm">
+                        <div class="form-group">
+                            <label for="adminUsername">Логин</label>
+                            <input type="text" class="form-control" id="adminUsername" placeholder="Введите логин">
+                        </div>
+                        <div class="form-group">
+                            <label for="adminPassword">Пароль</label>
+                            <input type="password" class="form-control" id="adminPassword" placeholder="Введите пароль">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="submitAdminLoginForm()">Войти</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openAdminLoginForm(event) {
+            event.preventDefault();
+            const adminLoginModal = new bootstrap.Modal(document.getElementById('adminLoginModal'));
+            adminLoginModal.show();
+        }
+
+        async function submitAdminLoginForm() {
+    const username = document.getElementById('adminUsername').value;
+    const password = document.getElementById('adminPassword').value;
+
+    try {
+        const response = await axios.post('/shop/admin/login', {
+            admin_name: username,
+            admin_password: password
+        });
+
+        if (response.data.Token.access_token) {
+            localStorage.setItem('adminToken', response.data.access_token);
+            alert('Успешный вход! Токен сохранен.');
+            // Здесь вы можете перенаправить на другую страницу или выполнить другие действия
+        } else {
+            alert('Ошибка входа: Невалидный ответ от сервера.');
+        }
+    } catch (error) {
+        // Извлечение сообщений об ошибке из сервера
+        const errorMessage = error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message;
+        alert(`Ошибка входа: ${errorMessage}`);
+    }
+}
+    </script>
 </body>
 </html>
