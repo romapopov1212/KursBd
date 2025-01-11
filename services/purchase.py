@@ -10,6 +10,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.future import select
 from fastapi.security import HTTPAuthorizationCredentials
 
+from settings import settings
 from services.buyers import http_bearer, AdminService
 from database import get_session
 from models.purchase import PurchaseProduct
@@ -33,7 +34,7 @@ class PurchaseService:
             credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
     ):
         current_user = self.admin_service.get_current_user(credentials)
-        if current_user != "admin":
+        if current_user != settings.admin_name:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Недостаточно прав для выполнения действия"
@@ -107,7 +108,7 @@ class PurchaseService:
     ) -> List[tables.Purchase]:
 
         current_user = self.admin_service.get_current_user(credentials)
-        if current_user != "admin":
+        if current_user != settings.admin_name:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Недостаточно прав для выполнения действия"
@@ -129,7 +130,7 @@ class PurchaseService:
             credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
     ) -> List[tables.PurchasedProducts]:
         current_user = self.admin_service.get_current_user(credentials)
-        if current_user != "admin":
+        if current_user != settings.admin_name:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Недостаточно прав для выполнения действия"
@@ -153,7 +154,7 @@ class PurchaseService:
     ):
 
         current_user = self.admin_service.get_current_user(credentials)
-        if current_user != "admin":
+        if current_user != settings.admin_name:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Недостаточно прав для выполнения действия"

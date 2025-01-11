@@ -55,13 +55,13 @@ async def get_admin_page(
     return templates.TemplateResponse("index_admin.html", {"request" : request, "products" : prod})
 
 
-@router.get("/")
+@router.get("/all")
 async def get_products(
-        current_page: int,
-        number_prod: int,
+        #current_page: int,
+        #number_prod: int,
         service: ProductsService=Depends(),
 ):
-    return await service.get_list(current_page, number_prod)
+    return await service.get_list()
 
 @router.get("/product/name/{product_name}")
 async def get_product(

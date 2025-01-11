@@ -10,147 +10,99 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
         <script src="/static/main.js"></script>
     </head>
-    <body class="bg-light">
-        <div class="container mt-5">
-            <div class="row justify-content-center">
-                <div class="col-md-10 p-md-0">
-                    <div class="d-flex justify-content-end mb-3">
-                        <a href="#" class="btn btn-primary" onclick="openAdminLoginForm(event)">Войти как администратор</a>
-                    </div>
-
-                    <h1 class="text-center mb-4">Список всех продуктов</h1>
-                    <table class="table table-striped text-center">
-                        <thead>
-                            <tr>
-                                <th>ID товара</th>
-                                <th>Название</th>
-                                <th>Цена</th>
-                                <th>Количество</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-
-                    <!-- Элементы управления пагинацией -->
-                    <div class="d-flex justify-content-center mt-4">
-                        <nav>
-                            <ul class="pagination">
-                                <li class="page-item">
-                                    <a class="page-link" href="#" id="prevPage" onclick="changePage(event, -1)">Назад</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#" id="nextPage" onclick="changePage(event, 1)">Вперед</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10 p-md-0">
+                <div class="d-flex justify-content-end mb-3">
+                    <a href="#" class="btn btn-primary" onclick="openAdminLoginForm(event)">Войти как администратор</a>
                 </div>
+                
+                <h1 class="text-center mb-4">Список всех продуктов</h1>
+                <table class="table table-striped text-center">
+                    <thead>
+                        <tr>
+                            <th>ID товара</th>
+                            <th>Название</th>
+                            <th>Цена</th>
+                            <th>Количество</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>{{ product.id }}</td>
+                            <td>{{ product.name }}</td>
+                            <td>{{ product.price }}</td>
+                            <td>{{ product.count }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
+        </div>
 
-            <div class="mb-4">
-                <h2>Поиск продукта по названию</h2>
-                <form id="searchByNameForm">
-                    <div class="form-group">
-                        <label for="productName">Название продукта:</label>
-                        <input type="text" class="form-control" id="productName" placeholder="Введите название продукта">
+        
+        <div class="mb-4">
+            <h2>Поиск продукта по названию</h2>
+            <form id="searchByNameForm">
+                <div class="form-group">
+                    <label for="productName">Название продукта:</label>
+                    <input type="text" class="form-control" id="productName" placeholder="Введите название продукта">
+                </div>
+                <button type="submit" class="btn btn-primary">Искать</button>
+            </form>
+        </div>
+
+        
+        <div class="mb-4">
+            <h2>Поиск продукта по ID</h2>
+            <form id="searchByIdForm">
+                <div class="form-group">
+                    <label for="productId">ID продукта:</label>
+                    <input type="number" class="form-control" id="productId" placeholder="Введите ID продукта">
+                </div>
+                <button type="submit" class="btn btn-primary">Искать</button>
+            </form>
+        </div>
+
+        
+        <div id="searchResults" class="mt-5">
+            <h3>Результаты поиска</h3>
+            <div id="resultsContainer" class="alert alert-info" style="display: none;"></div>
+        </div>
+
+        <div class="modal" tabindex="-1" role="dialog" id="adminLoginModal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Вход администратора</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
-                    <button type="submit" class="btn btn-primary">Искать</button>
-                </form>
-            </div>
-
-            <div class="mb-4">
-                <h2>Поиск продукта по ID</h2>
-                <form id="searchByIdForm">
-                    <div class="form-group">
-                        <label for="productId">ID продукта:</label>
-                        <input type="number" class="form-control" id="productId" placeholder="Введите ID продукта">
+                    <div class="modal-body">
+                        <form id="adminLoginForm">
+                            <div class="form-group">
+                                <label for="adminUsername">Логин</label>
+                                <input type="text" class="form-control" id="adminUsername" placeholder="Введите логин">
+                            </div>
+                            <div class="form-group">
+                                <label for="adminPassword">Пароль</label>
+                                <input type="password" class="form-control" id="adminPassword" placeholder="Введите пароль">
+                            </div>
+                        </form>
                     </div>
-                    <button type="submit" class="btn btn-primary">Искать</button>
-                </form>
-            </div>
-
-            <div id="searchResults" class="mt-5">
-                <h3>Результаты поиска</h3>
-                <div id="resultsContainer" class="alert alert-info" style="display: none;"></div>
-            </div>
-
-            <!-- Модальное окно для входа администратора -->
-            <div class="modal" tabindex="-1" role="dialog" id="adminLoginModal">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Вход администратора</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="adminLoginForm">
-                                <div class="form-group">
-                                    <label for="adminUsername">Логин</label>
-                                    <input type="text" class="form-control" id="adminUsername" placeholder="Введите логин">
-                                </div>
-                                <div class="form-group">
-                                    <label for="adminPassword">Пароль</label>
-                                    <input type="password" class="form-control" id="adminPassword" placeholder="Введите пароль">
-                                </div>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" onclick="submitAdminLoginForm()">Войти</button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-                        </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="submitAdminLoginForm()">Войти</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
     <script>
-
-            let currentPage = 1;
-            const pageSize = 5;
-
-
-            async function loadProducts(page = 1) {
-                try {
-                    const response = await axios.get(`/shop/products?current_page=${page}&number_prod=${pageSize}`);
-                    const products = response.data;
-
-                    const tableBody = document.querySelector('table tbody');
-                    tableBody.innerHTML = '';
-
-                    if (products.length === 0) {
-                        tableBody.innerHTML = `<tr><td colspan="4" class="text-center">Продукты не найдены</td></tr>`;
-                        return;
-                    }
-
-                    products.forEach(product => {
-                        const row = `
-                            <tr>
-                                <td>${product.id}</td>
-                                <td>${product.name}</td>
-                                <td>${product.price}</td>
-                                <td>${product.count}</td>
-                            </tr>
-                        `;
-                        tableBody.innerHTML += row;
-                    });
-
-                    currentPage = page;
-                } catch (error) {
-                    alert('Ошибка загрузки продуктов: ' + (error.response?.data?.detail || error.message));
-                }
-            }
-
-            function changePage(event, direction) {
-                event.preventDefault();
-                const newPage = currentPage + direction;
-                if (newPage < 1) return;
-
-                loadProducts(newPage);
-            }
-
         function openAdminLoginForm(event) {
             event.preventDefault();
             const adminLoginModal = new bootstrap.Modal(document.getElementById('adminLoginModal'));
@@ -179,6 +131,7 @@
             }
         }
 
+        
         function displayResults(data) {
             const resultsContainer = document.getElementById('resultsContainer');
             resultsContainer.style.display = 'block';
@@ -190,6 +143,7 @@
             `;
         }
 
+        
         document.getElementById('searchByNameForm').addEventListener('submit', async function(event) {
             event.preventDefault();
             const productName = document.getElementById('productName').value;
@@ -202,6 +156,7 @@
             }
         });
 
+        
         document.getElementById('searchByIdForm').addEventListener('submit', async function(event) {
             event.preventDefault();
             const productId = document.getElementById('productId').value;
@@ -213,10 +168,9 @@
                 alert('Ошибка поиска: ' + (error.response?.data?.detail || error.message));
             }
         });
-
-        document.addEventListener('DOMContentLoaded', () => {
-                loadProducts(currentPage);
-            });
     </script>
 </body>
 </html>
+
+
+

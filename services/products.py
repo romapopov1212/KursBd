@@ -7,6 +7,7 @@ from fastapi import status
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.future import select
 from services.admin_token import http_bearer
+from settings import settings
 
 from models.products import Product
 from database import get_session
@@ -30,7 +31,7 @@ class ProductsService:
             credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
     ):
         current_user = self.admin_service.get_current_user(credentials)
-        if current_user != "admin":
+        if current_user != settings.admin_name:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Недостаточно прав для выполнения действия"
@@ -43,7 +44,7 @@ class ProductsService:
             credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
     ):
         current_user = self.admin_service.get_current_user(credentials)
-        if current_user != "admin":
+        if current_user != settings.admin_name:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Недостаточно прав для выполнения действия"
@@ -77,7 +78,7 @@ class ProductsService:
             credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
     ):
         current_user = self.admin_service.get_current_user(credentials)
-        if current_user != "admin":
+        if current_user != settings.admin_name:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Недостаточно прав для выполнения действия"
@@ -93,10 +94,15 @@ class ProductsService:
 
 
 
-    async def get_list(self, page: int = 1, page_size: int = 5) -> List[tables.Products]:
-        offset = (page - 1) * page_size
+    async def get_list(
+            self, 
+            #page: int = 1, 
+            #page_size: int = 5
+
+    ) -> List[tables.Products]:
+        #offset = (page - 1) * page_size
         
-        stmt = select(tables.Products).limit(page_size).offset(offset)
+        stmt = select(tables.Products)
         result = await self.session.execute(stmt)
         prod = result.scalars().all()
 
@@ -154,7 +160,7 @@ class ProductsService:
             credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
     ):
         current_user = self.admin_service.get_current_user(credentials)
-        if current_user != "admin":
+        if current_user != settings.admin_name:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Недостаточно прав для выполнения действия"
@@ -186,7 +192,7 @@ class ProductsService:
             credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
     ):
         current_user = self.admin_service.get_current_user(credentials)
-        if current_user != "admin":
+        if current_user != settings.admin_name:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Недостаточно прав для выполнения действия"

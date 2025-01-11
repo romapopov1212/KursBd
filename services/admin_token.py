@@ -9,6 +9,8 @@ from fastapi import HTTPException, status
 from  datetime import timedelta, datetime, timezone
 from fastapi.security import HTTPAuthorizationCredentials
 
+from models.admin import AdminLogin
+
 http_bearer = HTTPBearer(auto_error=False)
 
 class AdminService:
@@ -33,10 +35,9 @@ class AdminService:
 
     async def login_admin(
             self,
-            admin_email:str,
-            admin_password: str
+            admin_data: AdminLogin,
     ) -> Token:
-        if admin_email != settings.admin_name or admin_password != settings.admin_password:
+        if admin_data.admin_name != settings.admin_name or admin_data.admin_password != settings.admin_password:
             raise HTTPException(
                 status_code= status.HTTP_401_UNAUTHORIZED,
                 detail="Неверный логин или пароль админа"
@@ -45,7 +46,7 @@ class AdminService:
 
         access_token = self.create_access_token(
             data={
-                "sub": admin_email,
+                "sub": admin_data.admin_name,
                 "exp": expire
             }
         )
