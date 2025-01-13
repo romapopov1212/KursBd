@@ -120,8 +120,10 @@
                 });
 
                 if (response.data.access_token) {
-                    localStorage.setItem('adminToken', response.data.access_token);
+                    // localStorage.setItem('adminToken', response.data.access_token);
+                    window.location.href = 'admin_page';
                     alert('Успешный вход! Токен сохранен.');
+                    
                 } else {
                     alert('Ошибка входа: Невалидный ответ от сервера.');
                 }

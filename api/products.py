@@ -1,10 +1,13 @@
-from fastapi import APIRouter, Form
+from fastapi import APIRouter, Form, HTTPException
 from pydantic import BaseModel
 from fastapi import Depends, Request
 from fastapi.security import HTTPAuthorizationCredentials
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
+from fastapi import status
 
+from settings import settings
+from services.admin_token import AdminService
 from services.admin_token import http_bearer
 from services.products import ProductsService
 from models.products import Product
@@ -36,25 +39,25 @@ async def update_product(
 ):
     return await service.update_product(product_id, new_product_data, credentials)
 
-#для отрисовки страниц(потом надо куда нибудь переместить в отдельный файл)
-@router.get("/products_page", response_class=HTMLResponse)
-async def get_page(
-        request: Request,
-        service: ProductsService = Depends()
-):
-    prod = await service.get_list()
-    return templates.TemplateResponse("index.html", {"request": request, "products": prod})
+# #для отрисовки страниц(потом надо куда нибудь переместить в отдельный файл)
+# @router.get("/products_page", response_class=HTMLResponse)
+# async def get_page(
+#         request: Request,
+#         service: ProductsService = Depends()
+# ):
+#     prod = await service.get_list()
+#     return templates.TemplateResponse("index.html", {"request": request, "products": prod})
 
 
-@router.get("/admin_page", response_class=HTMLResponse)
-async def get_admin_page(
-        request: Request,
-        service: ProductsService = Depends()
-):
-    prod = await service.get_list()
-    return templates.TemplateResponse("index_admin.html", {"request" : request, "products" : prod})
+# @router.get("/admin_page", response_class=HTMLResponse)
+# async def get_admin_page(
+#         request: Request,
+#         service: ProductsService = Depends()
+# ):
+#     prod = await service.get_list()
+#     return templates.TemplateResponse("index_admin.html", {"request" : request, "products" : prod})
 
-
+##########
 @router.get("/all")
 async def get_products(
         #current_page: int,

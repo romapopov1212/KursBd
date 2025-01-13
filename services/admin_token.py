@@ -8,6 +8,7 @@ from models.token import Token
 from fastapi import HTTPException, status
 from  datetime import timedelta, datetime, timezone
 from fastapi.security import HTTPAuthorizationCredentials
+from fastapi.responses import Response
 
 from models.admin import AdminLogin
 
@@ -53,7 +54,10 @@ class AdminService:
         return Token(access_token=access_token)
 
 
-    def get_current_user(self, credentials:HTTPAuthorizationCredentials = Depends(http_bearer)):
+    def get_current_user(
+            self, 
+            credentials:HTTPAuthorizationCredentials = Depends(http_bearer)
+    ):
         if not credentials:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
