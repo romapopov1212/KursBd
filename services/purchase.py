@@ -10,6 +10,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.future import select
 from fastapi.security import HTTPAuthorizationCredentials
 
+from services.buyers import BuyersService
 from settings import settings
 from services.buyers import http_bearer, AdminService
 from database import get_session
@@ -21,29 +22,24 @@ class PurchaseService:
             self,
             session: Session = Depends(get_session),
             service: ProductsService = Depends(),
-            admin_service: AdminService = Depends()
+            admin_service: AdminService = Depends(),
+            buyer_service: BuyersService = Depends()
     ):
         self.session = session
         self.service = service
         self.admin_service = admin_service
+        self.buyer_service = buyer_service
 
     async def make_purchase(
             self,
             buyer_number: str,
             products_to_buy: List[PurchaseProduct],
-            credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
     ):
-        current_user = self.admin_service.get_current_user(credentials)
-        if current_user != settings.admin_name:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Недостаточно прав для выполнения действия"
-            )
         buyer = await self.session.get(tables.Buyers, buyer_number)
         if not buyer:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Покупатель с номером телефона {buyer_number} не найден."
+                detail="Покупатель с таким номером телефона не найден, сначала зарегистрируйтесь"
             )
 
         purchase = tables.Purchase(

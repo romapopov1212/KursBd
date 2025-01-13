@@ -34,14 +34,7 @@ class BuyersService:
     async def add_buyers(
             self,
             buyers_data: Buyers,
-            credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
     ):
-        current_user = self.admin_service.get_current_user(credentials)
-        if current_user != settings.admin_name:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Недостаточно прав для выполнения действия"
-            )
         stmt = select(tables.Buyers).filter(tables.Buyers.telephone_number == buyers_data.telephone_number)
         result = await self.session.execute(stmt)
         buyer_by_number = result.scalars().first()

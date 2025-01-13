@@ -15,9 +15,8 @@ router = APIRouter(
 async def add_buyer(
         buyer_data: Buyers,
         service: BuyersService=Depends(),
-        credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
 ):
-    return await service.add_buyers(buyer_data, credentials)
+    return await service.add_buyers(buyer_data)
 
 @router.delete("/buyer/delete")
 async def delete(

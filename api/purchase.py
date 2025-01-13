@@ -16,12 +16,11 @@ router = APIRouter(
 async def create_purchase(
         purchase: Purchase,
         service: PurchaseService = Depends(),
-        credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
+        
 ):
     return await service.make_purchase(
         buyer_number=purchase.buyer_number,
         products_to_buy=purchase.products,
-        credentials=credentials
     )
 
 @router.get("/all")
