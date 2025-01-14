@@ -59,15 +59,24 @@ class BuyersService:
     async def delete(
             self,
             buyer_number,
-            credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
+            token:str,
+            #credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
     ):
-        current_user = self.admin_service.get_current_user(credentials)
+        current_user = self.admin_service.get_current_user(token)
         if current_user != settings.admin_name:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Недостаточно прав для выполнения действия"
             )
-        buyer_for_delete = await self.get_buyer_by_number(buyer_number)
+        stmt = select(tables.Purchase).filter(tables.Purchase.buyer_number == buyer_number)
+        res = await self.session.execute(stmt)
+        buyer_by_number = res.scalars().first()
+        if buyer_by_number is not None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Этот пользователь есть в данных о купленных товарах, удалите сначала их."
+            )
+        buyer_for_delete = await self.get_buyer_by_number(buyer_number, token)
         await self.session.delete(buyer_for_delete)
         await self.session.commit()
         return JSONResponse(
@@ -77,10 +86,11 @@ class BuyersService:
 
     async def get_list(
             self,
-            credentials: HTTPAuthorizationCredentials=Depends()
+            token: str
+            #credentials: HTTPAuthorizationCredentials=Depends()
     ) -> List[tables.Buyers]:
 
-        current_user = self.admin_service.get_current_user(credentials)
+        current_user = self.admin_service.get_current_user(token)
         if current_user != settings.admin_name:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -99,9 +109,10 @@ class BuyersService:
     async def get_buyer_by_number(
             self,
             number: str,
-            credentials: HTTPAuthorizationCredentials=Depends()
+            token:str
+            #credentials: HTTPAuthorizationCredentials=Depends()
     ):
-        current_user = self.admin_service.get_current_user(credentials)
+        current_user = self.admin_service.get_current_user(token)
         if current_user != settings.admin_name:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,

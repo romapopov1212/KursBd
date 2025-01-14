@@ -48,7 +48,8 @@
     <script>
         function redirectToProductsPage(event) {
             event.preventDefault();
-            localStorage.removeItem('adminToken');
+            // document.cookies = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+            document.cookie = "token=; path=/; domain=" + window.location.hostname + "; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
             window.location.href = "products_page";
         }
     </script>

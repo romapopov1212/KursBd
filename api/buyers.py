@@ -1,7 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials
 
+from services.admin_token import AdminService
 from services.buyers import http_bearer
 from models.buyers import Buyers
 from services.buyers import BuyersService
@@ -22,13 +23,19 @@ async def add_buyer(
 async def delete(
         buyer_number: str,
         service: BuyersService=Depends(),
-        credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
+        request: Request = None,
+        admin_serice: AdminService = Depends(),
+        #credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
 ):
-    return await service.delete(buyer_number, credentials)
+    t = admin_serice.get_cooks_and_check_is_admin(request=request)
+    return await service.delete(buyer_number, t)
 
 @router.get("/all")
 async def get_all_buyers(
         service:BuyersService=Depends(),
-        credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
+        request: Request = None,
+        admin_serice: AdminService = Depends(),
+        #credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
 ):
-    return await service.get_list(credentials)
+    t = admin_serice.get_cooks_and_check_is_admin(request=request)
+    return await service.get_list(t)

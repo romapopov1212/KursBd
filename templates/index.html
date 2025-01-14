@@ -14,7 +14,8 @@
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-10 p-md-0">
-                <div class="d-flex justify-content-end mb-3">
+                <div class="d-flex justify-content-between mb-3">
+                    <a href="#" class="btn btn-secondary" onclick="openRegisterForm(event)">Регистрация для покупателя</a>
                     <a href="#" class="btn btn-primary" onclick="openAdminLoginForm(event)">Войти как администратор</a>
                 </div>
                 
@@ -42,7 +43,6 @@
             </div>
         </div>
 
-        
         <div class="mb-4">
             <h2>Поиск продукта по названию</h2>
             <form id="searchByNameForm">
@@ -54,7 +54,6 @@
             </form>
         </div>
 
-        
         <div class="mb-4">
             <h2>Поиск продукта по ID</h2>
             <form id="searchByIdForm">
@@ -66,7 +65,6 @@
             </form>
         </div>
 
-        
         <div id="searchResults" class="mt-5">
             <h3>Результаты поиска</h3>
             <div id="resultsContainer" class="alert alert-info" style="display: none;"></div>
@@ -100,6 +98,43 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal" tabindex="-1" role="dialog" id="registerModal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Регистрация</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="registerForm">
+                            <div class="form-group">
+                                <label for="registerPhone">Номер телефона</label>
+                                <input type="tel" class="form-control" id="registerPhone" placeholder="Введите номер телефона">
+                            </div>
+                            <div class="form-group">
+                                <label for="registerLastName">Фамилия</label>
+                                <input type="text" class="form-control" id="registerLastName" placeholder="Введите фамилию">
+                            </div>
+                            <div class="form-group">
+                                <label for="registerFirstName">Имя</label>
+                                <input type="text" class="form-control" id="registerFirstName" placeholder="Введите имя">
+                            </div>
+                            <div class="form-group">
+                                <label for="registerMiddleName">Отчество</label>
+                                <input type="text" class="form-control" id="registerMiddleName" placeholder="Введите отчество">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="submitRegisterForm()">Зарегистрироваться</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -107,6 +142,39 @@
             event.preventDefault();
             const adminLoginModal = new bootstrap.Modal(document.getElementById('adminLoginModal'));
             adminLoginModal.show();
+        }
+
+        function openRegisterForm(event) {
+            event.preventDefault();
+            const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+            registerModal.show();
+        }
+
+        async function submitRegisterForm() {
+            const phone = document.getElementById('registerPhone').value;
+            const lastName = document.getElementById('registerLastName').value;
+            const firstName = document.getElementById('registerFirstName').value;
+            const middleName = document.getElementById('registerMiddleName').value;
+
+            try {
+                const response = await axios.post('/shop/buyers/buyer/add', {
+                    telephone_number:phone,
+                    surname:lastName,
+                    firstname:firstName,
+                    lastname:middleName
+                });
+
+                if (response.status === 200) {
+                    alert('Регистрация успешна!');
+                    // const registerModal = bootstrap.Modal.getInstance(document.getElementById('registerModal'));
+                    // registerModal.hide();
+                } else {
+                    alert('Ошибка регистрации: ' + (response.data.message || 'Неизвестная ошибка'));
+                }
+            } catch (error) {
+                const errorMessage = error.response?.data?.detail || error.message;
+                alert(`Ошибка регистрации: ${errorMessage}`);
+            }
         }
 
         async function submitAdminLoginForm() {
@@ -120,20 +188,17 @@
                 });
 
                 if (response.data.access_token) {
-                    // localStorage.setItem('adminToken', response.data.access_token);
                     window.location.href = 'admin_page';
-                    alert('Успешный вход! Токен сохранен.');
-                    
+                    alert('Успешный вход!');
                 } else {
                     alert('Ошибка входа: Невалидный ответ от сервера.');
                 }
             } catch (error) {
-                const errorMessage = error.response?.data?.detail || JSON.stringify(error.response?.data) || error.message;
+                const errorMessage = error.response?.data?.detail || error.message;
                 alert(`Ошибка входа: ${errorMessage}`);
             }
         }
 
-        
         function displayResults(data) {
             const resultsContainer = document.getElementById('resultsContainer');
             resultsContainer.style.display = 'block';
@@ -145,7 +210,6 @@
             `;
         }
 
-        
         document.getElementById('searchByNameForm').addEventListener('submit', async function(event) {
             event.preventDefault();
             const productName = document.getElementById('productName').value;
@@ -158,7 +222,6 @@
             }
         });
 
-        
         document.getElementById('searchByIdForm').addEventListener('submit', async function(event) {
             event.preventDefault();
             const productId = document.getElementById('productId').value;
@@ -171,8 +234,3 @@
             }
         });
     </script>
-</body>
-</html>
-
-
-

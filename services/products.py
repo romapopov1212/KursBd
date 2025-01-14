@@ -41,9 +41,10 @@ class ProductsService:
     async def add_product(
             self,
             product_data: Product,
-            credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
+            token:str
+            #credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
     ):
-        current_user = self.admin_service.get_current_user(credentials)
+        current_user = self.admin_service.get_current_user(token)
         if current_user != settings.admin_name:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -75,9 +76,10 @@ class ProductsService:
             self,
             product_id,
             new_data: Product,
-            credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
+            token:str
+            #credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
     ):
-        current_user = self.admin_service.get_current_user(credentials)
+        current_user = self.admin_service.get_current_user(token)
         if current_user != settings.admin_name:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -157,9 +159,10 @@ class ProductsService:
     async def delete_by_id(
             self,
             product_id,
-            credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
+            token:str
+            #credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
     ):
-        current_user = self.admin_service.get_current_user(credentials)
+        current_user = self.admin_service.get_current_user(token)
         if current_user != settings.admin_name:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -189,9 +192,10 @@ class ProductsService:
     async def delete_by_name(
             self,
             product_name: str,
-            credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
+            token:str
+            #credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
     ):
-        current_user = self.admin_service.get_current_user(credentials)
+        current_user = self.admin_service.get_current_user(token)
         if current_user != settings.admin_name:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
