@@ -18,7 +18,7 @@
                     <a href="#" class="btn btn-secondary" onclick="openRegisterForm(event)">Регистрация для покупателя</a>
                     <a href="#" class="btn btn-primary" onclick="openAdminLoginForm(event)">Войти как администратор</a>
                 </div>
-                
+                <!-- СПИСОК ПОКУПОК -->
                 <h1 class="text-center mb-4">Список всех продуктов</h1>
                 <table class="table table-striped text-center">
                     <thead>
@@ -40,9 +40,14 @@
                         {% endfor %}
                     </tbody>
                 </table>
+
+                <!-- КНОПКА СОВЕРШ ПОКУПКУ-->
+                <div class="text-center mt-3">
+                    <button class="btn btn-success" onclick="makePurchase()">Совершить покупку</button>
+                </div>
             </div>
         </div>
-
+        <!-- ПОИСК ПО НАЗВАНИЮ -->
         <div class="mb-4">
             <h2>Поиск продукта по названию</h2>
             <form id="searchByNameForm">
@@ -53,7 +58,7 @@
                 <button type="submit" class="btn btn-primary">Искать</button>
             </form>
         </div>
-
+        <!-- ПОИСК ПО id -->
         <div class="mb-4">
             <h2>Поиск продукта по ID</h2>
             <form id="searchByIdForm">
@@ -64,7 +69,7 @@
                 <button type="submit" class="btn btn-primary">Искать</button>
             </form>
         </div>
-
+        <!--  РЕЗУЛЬТАТ ПОИСКА  -->
         <div id="searchResults" class="mt-5">
             <h3>Результаты поиска</h3>
             <div id="resultsContainer" class="alert alert-info" style="display: none;"></div>
@@ -135,6 +140,49 @@
                 </div>
             </div>
         </div>
+
+        <!-- Модальное окно для совершения покупки -->
+        <div class="modal" tabindex="-1" role="dialog" id="purchaseModal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Совершить покупку</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="purchaseForm">
+                            <div class="form-group">
+                                <label for="purchasePhone">Номер телефона</label>
+                                <input type="tel" class="form-control" id="purchasePhone" placeholder="Введите номер телефона">
+                            </div>
+
+                            <!-- Поля для выбора продуктов -->
+                            <div id="productFieldsContainer">
+                                <div class="product-group">
+                                    <div class="form-group">
+                                        <label>ID продукта</label>
+                                        <input type="number" class="form-control product-id" placeholder="Введите ID продукта">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Количество</label>
+                                        <input type="number" class="form-control product-quantity" placeholder="Введите количество">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-secondary" onclick="addProductFields()">Еще</button>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="submitPurchaseForm()">Совершить покупку</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -166,8 +214,7 @@
 
                 if (response.status === 200) {
                     alert('Регистрация успешна!');
-                    // const registerModal = bootstrap.Modal.getInstance(document.getElementById('registerModal'));
-                    // registerModal.hide();
+
                 } else {
                     alert('Ошибка регистрации: ' + (response.data.message || 'Неизвестная ошибка'));
                 }
@@ -233,4 +280,69 @@
                 alert('Ошибка поиска: ' + (error.response?.data?.detail || error.message));
             }
         });
+
+
+        // Функция для открытия формы покупки
+        function makePurchase() {
+            const purchaseModal = new bootstrap.Modal(document.getElementById('purchaseModal'));
+            purchaseModal.show();
+        }
+
+        // Функция для добавления дополнительных полей продукта
+        function addProductFields() {
+            const container = document.getElementById('productFieldsContainer');
+            const productGroup = document.createElement('div');
+            productGroup.classList.add('product-group');
+            productGroup.innerHTML = `
+                <div class="form-group">
+                    <label>ID продукта</label>
+                    <input type="number" class="form-control product-id" placeholder="Введите ID продукта">
+                </div>
+                <div class="form-group">
+                    <label>Количество</label>
+                    <input type="number" class="form-control product-quantity" placeholder="Введите количество">
+                </div>
+            `;
+            container.appendChild(productGroup);
+        }
+
+        // Функция для отправки формы покупки
+        async function submitPurchaseForm() {
+            const phone = document.getElementById('purchasePhone').value;
+            const productGroups = document.querySelectorAll('.product-group');
+
+            if (!phone || productGroups.length === 0) {
+                alert('Пожалуйста, заполните все обязательные поля.');
+                return;
+            }
+
+            const products = Array.from(productGroups).map(group => {
+                const productId = group.querySelector('.product-id').value;
+                const count = group.querySelector('.product-quantity').value;
+                if (!productId || !count) {
+                    throw new Error('Все поля продукта должны быть заполнены.');
+                }
+                return {
+                    product_id: parseInt(productId, 10),
+                    count: parseInt(count, 10)
+                };
+            });
+
+            try {
+                const response = await axios.post('/shop/purchases/purchase', {
+                    buyer_number: phone,
+                    products: products
+                });
+
+                if (response.status === 200) {
+                    alert('Покупка успешно совершена!');
+                    window.location.href = 'products_page';
+                } else {
+                    alert('Ошибка при совершении покупки: ' + (response.data.message || 'Неизвестная ошибка'));
+                }
+            } catch (error) {
+                const errorMessage = error.response?.data?.detail || error.message;
+                alert(`Ошибка при совершении покупки: ${errorMessage}`);
+            }
+        }
     </script>

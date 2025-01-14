@@ -12,7 +12,7 @@ router = APIRouter(
 )
 
 
-@router.post("/purchase/")
+@router.post("/purchase")
 async def create_purchase(
         purchase: Purchase,
         service: PurchaseService = Depends(),
