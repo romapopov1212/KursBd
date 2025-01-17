@@ -20,6 +20,10 @@
                     <a href="#" class="btn btn-danger" onclick="redirectToProductsPage(event)">Выйти из аккаунта администратора</a>
                 </div>
                 
+                <div class="d-flex justify-content-start mb-3">
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#editProductModal">Редактировать товар</button>
+                </div>
+                
                 <h1 class="text-center mb-4">Список всех продуктов</h1>
                 <table class="table table-striped text-center">
                     <thead>
@@ -120,7 +124,40 @@
                 </form>
             </div>
         </div>
+    </div>
 
+    <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProductModalLabel">Редактировать товар</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editProductForm">
+                        <div class="form-group">
+                            <label for="editProductId">ID:</label>
+                            <input type="number" class="form-control" id="editProductId" placeholder="Введите ID">
+                        </div>
+                        <div class="form-group">
+                            <label for="editProductName">Имя:</label>
+                            <input type="text" class="form-control" id="editProductName" placeholder="Введите имя">
+                        </div>
+                        <div class="form-group">
+                            <label for="editProductPrice">Цена:</label>
+                            <input type="number" class="form-control" id="editProductPrice" placeholder="Введите цену">
+                        </div>
+                        <div class="form-group">
+                            <label for="editProductCount">Количество:</label>
+                            <input type="number" class="form-control" id="editProductCount" placeholder="Введите количество">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
     <script>
         function redirectToProductsPage(event) {
@@ -206,6 +243,23 @@
             alert('Ошибка удаления продукта: ' + (error.response?.data?.detail || error.message));
         }
     });
+
+    document.getElementById('editProductForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const product_id = document.getElementById('editProductId').value;
+        const name = document.getElementById('editProductName').value;
+        const price = document.getElementById('editProductPrice').value;
+        const count = document.getElementById('editProductCount').value;
+
+        try {
+            let response =  await axios.patch(`/shop/products/update_product/${product_id}`, { product_id, name, price, count });
+            alert(response.data.message);
+            location.reload();
+        } catch (error) {
+            alert('Ошибка обновления продукта: ' + (error.response?.data?.detail || error.message));
+        }
+    });
+
     </script>
 </body>
 </html>
