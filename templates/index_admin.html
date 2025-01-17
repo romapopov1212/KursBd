@@ -45,27 +45,67 @@
             </div>
         </div>
 
-        <div class="mb-4">
-            <h2>Поиск продукта по названию</h2>
-            <form id="searchByNameForm">
-                <div class="form-group">
-                    <label for="productName">Название продукта:</label>
-                    <input type="text" class="form-control" id="productName" placeholder="Введите название продукта">
-                </div>
-                <button type="submit" class="btn btn-primary">Искать</button>
-            </form>
+        <div class="row mb-4">
+            <!-- Поиск продукта -->
+            <div class="col-md-6">
+                <h2>Поиск продукта</h2>
+                <form id="searchByNameForm" class="mb-3">
+                    <div class="form-group">
+                        <label for="productName">Название продукта:</label>
+                        <input type="text" class="form-control" id="productName" placeholder="Введите название продукта">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Искать</button>
+                </form>
+                <form id="searchByIdForm">
+                    <div class="form-group">
+                        <label for="productId">ID продукта:</label>
+                        <input type="number" class="form-control" id="productId" placeholder="Введите ID продукта">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Искать</button>
+                </form>
+            </div>
+            <!-- Добавление продукта -->
+            <div class="col-md-6">
+                <h2>Добавить продукт</h2>
+                <form id="addProductForm">
+                    <div class="form-group">
+                        <label for="newProductName">Имя:</label>
+                        <input type="text" class="form-control" id="newProductName" placeholder="Введите имя продукта">
+                    </div>
+                    <div class="form-group">
+                        <label for="newProductPrice">Цена:</label>
+                        <input type="number" class="form-control" id="newProductPrice" placeholder="Введите цену">
+                    </div>
+                    <div class="form-group">
+                        <label for="newProductCount">Количество:</label>
+                        <input type="number" class="form-control" id="newProductCount" placeholder="Введите количество">
+                    </div>
+                    <button type="submit" class="btn btn-success">Добавить</button>
+                </form>
+                <h2 class="mt-4">Добавить покупателя</h2>
+                <form id="addCustomerForm">
+                    <div class="form-group">
+                        <label for="customerPhone">Телефон:</label>
+                        <input type="text" class="form-control" id="customerPhone" placeholder="Введите телефон">
+                    </div>
+                    <div class="form-group">
+                        <label for="customerFirstName">Имя:</label>
+                        <input type="text" class="form-control" id="customerFirstName" placeholder="Введите имя">
+                    </div>
+                    <div class="form-group">
+                        <label for="customerLastName">Фамилия:</label>
+                        <input type="text" class="form-control" id="customerLastName" placeholder="Введите фамилию">
+                    </div>
+                    <div class="form-group">
+                        <label for="customerMiddleName">Отчество:</label>
+                        <input type="text" class="form-control" id="customerMiddleName" placeholder="Введите отчество">
+                    </div>
+                    <button type="submit" class="btn btn-success">Добавить</button>
+                </form>
+            </div>
         </div>
-        <!-- ПОИСК ПО id -->
-        <div class="mb-4">
-            <h2>Поиск продукта по ID</h2>
-            <form id="searchByIdForm">
-                <div class="form-group">
-                    <label for="productId">ID продукта:</label>
-                    <input type="number" class="form-control" id="productId" placeholder="Введите ID продукта">
-                </div>
-                <button type="submit" class="btn btn-primary">Искать</button>
-            </form>
-        </div>
+
+
         <!--  РЕЗУЛЬТАТ ПОИСКА  -->
         <div id="searchResults" class="mt-5">
             <h3>Результаты поиска</h3>
@@ -111,6 +151,37 @@
             displayResults(response.data);
         } catch (error) {
             alert('Ошибка поиска: ' + (error.response?.data?.detail || error.message));
+        }
+    });
+
+    document.getElementById('addProductForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const name = document.getElementById('newProductName').value;
+        const price = document.getElementById('newProductPrice').value;
+        const count = document.getElementById('newProductCount').value;
+
+        try {
+            await axios.post('/shop/products/add_product', { name, price, count });
+            alert('Продукт успешно добавлен!');
+            location.reload();
+        } catch (error) {
+            alert('Ошибка добавления продукта: ' + (error.response?.data?.detail || error.message));
+        }
+    });
+
+    document.getElementById('addCustomerForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const telephone_number = document.getElementById('customerPhone').value;
+        const firstname = document.getElementById('customerFirstName').value;
+        const surname = document.getElementById('customerLastName').value;
+        const lastname = document.getElementById('customerMiddleName').value;
+
+        try {
+            await axios.post('/shop/buyers/buyer/add', { telephone_number, firstname, surname, lastname });
+            alert('Покупатель успешно добавлен!');
+            location.reload();
+        } catch (error) {
+            alert('Ошибка добавления покупателя: ' + (error.response?.data?.detail || error.message));
         }
     });
     </script>
