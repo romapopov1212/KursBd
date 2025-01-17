@@ -13,7 +13,7 @@ from services.buyers import BuyersService
 templates = Jinja2Templates(directory="templates")
 
 router = APIRouter(
-    prefix="/shop/buyers",
+    prefix="/shop/products",
     tags=['buyers']
 )
 
@@ -34,6 +34,16 @@ async def delete(
 ):
     t = admin_serice.get_cooks_and_check_is_admin(request=request)
     return await service.delete(buyer_number, t)
+
+@router.get("/buyer/{telephone_number}")
+async def get_by_number(
+    telephone_number:str,
+    service: BuyersService = Depends(),
+    request: Request = None,
+    admin_service: AdminService = Depends()
+):
+    t = admin_service.get_cooks_and_check_is_admin(request=request)
+    return await service.get_by_number(telephone_number, t)
 
 @router.get("/all")
 async def get_all_buyers(

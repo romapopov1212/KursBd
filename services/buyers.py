@@ -84,6 +84,28 @@ class BuyersService:
             content={"message": f"Покупатель удален"}
         )
 
+    async def get_by_number(
+        self,
+        telephone_number:str,
+        token:str,      
+    ):
+        current_user = self.admin_service.get_current_user(token)
+        if current_user != settings.admin_name:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Недостаточно прав для выполнения действия"
+            )
+        stmt = select(tables.Buyers).filter(tables.Buyers.telephone_number == telephone_number)
+        res = await self.session.execute(stmt)
+        buyer_by_number = res.scalars().first()
+        if buyer_by_number is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail= f"Покупатель с номером: {telephone_number} не найден."
+            )
+        return buyer_by_number
+        
+
     async def get_list(
             self,
             token: str

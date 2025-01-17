@@ -60,18 +60,12 @@
         <div class="row mb-4">
             <!-- Поиск покупателя -->
             <div class="col-md-6">
-                <h2>Поиск продукта</h2>
-                <form id="searchByNameForm" class="mb-3">
-                    <div class="form-group">
-                        <label for="productName">Название продукта:</label>
-                        <input type="text" class="form-control" id="productName" placeholder="Введите название продукта">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Искать</button>
-                </form>
+                <h2>Поиск покупателя</h2>
+                
                 <form id="searchByIdForm">
                     <div class="form-group">
-                        <label for="productId">ID продукта:</label>
-                        <input type="number" class="form-control" id="productId" placeholder="Введите ID продукта">
+                        <label for="productId">Номер телефона:</label>
+                        <input type="number" class="form-control" id="productId" placeholder="Введите номер телефона покупателя">
                     </div>
                     <button type="submit" class="btn btn-primary">Искать</button>
                 </form>
@@ -80,24 +74,8 @@
                     <div id="resultsContainer" class="alert alert-info" style="display: none; font-size: 0.9rem; padding: 0.5rem;"></div>
                 </div>
             </div>
-            <!-- Добавление продукта -->
+            <!-- Добавление покупателя -->
             <div class="col-md-6">
-                <h2>Добавить продукт</h2>
-                <form id="addProductForm">
-                    <div class="form-group">
-                        <label for="newProductName">Имя:</label>
-                        <input type="text" class="form-control" id="newProductName" placeholder="Введите имя продукта">
-                    </div>
-                    <div class="form-group">
-                        <label for="newProductPrice">Цена:</label>
-                        <input type="number" class="form-control" id="newProductPrice" placeholder="Введите цену">
-                    </div>
-                    <div class="form-group">
-                        <label for="newProductCount">Количество:</label>
-                        <input type="number" class="form-control" id="newProductCount" placeholder="Введите количество">
-                    </div>
-                    <button type="submit" class="btn btn-success">Добавить</button>
-                </form>
                 <h2 class="mt-4">Добавить покупателя</h2>
                 <form id="addCustomerForm">
                     <div class="form-group">
@@ -166,48 +144,21 @@
         const resultsContainer = document.getElementById('resultsContainer');
         resultsContainer.style.display = 'block';
         resultsContainer.innerHTML = `
-            <p><strong>ID:</strong> ${data.id || 'N/A'}</p>
-            <p><strong>Название:</strong> ${data.name || 'N/A'}</p>
-            <p><strong>Цена:</strong> ${data.price || 'N/A'}</p>
-            <p><strong>Количество:</strong> ${data.count || '0'}</p>
+            <p><strong>Номер телефона:</strong> ${data.telephone_number|| 'N/A'}</p>
+            <p><strong>Фамилия:</strong> ${data.surname || 'N/A'}</p>
+            <p><strong>Имя:</strong> ${data.name || '0'}</p>
+            <p><strong>Отчество:</strong> ${data.lastname || '0'}</p>
         `;
     }
-    document.getElementById('searchByNameForm').addEventListener('submit', async function(event) {
-    event.preventDefault();
-    const productName = document.getElementById('productName').value;
-
-    try {
-        const response = await axios.get(`/shop/products/product/name/${productName}`);
-        displayResults(response.data);
-    } catch (error) {
-        alert('Ошибка поиска: ' + (error.response?.data?.detail || error.message));
-    }
-    });
-
     document.getElementById('searchByIdForm').addEventListener('submit', async function(event) {
         event.preventDefault();
         const productId = document.getElementById('productId').value;
 
         try {
-            const response = await axios.get(`/shop/products/product/id/${productId}`);
+            const response = await axios.get(`/shop/products/buyer/${productId}`);
             displayResults(response.data);
         } catch (error) {
             alert('Ошибка поиска: ' + (error.response?.data?.detail || error.message));
-        }
-    });
-
-    document.getElementById('addProductForm').addEventListener('submit', async function(event) {
-        event.preventDefault();
-        const name = document.getElementById('newProductName').value;
-        const price = document.getElementById('newProductPrice').value;
-        const count = document.getElementById('newProductCount').value;
-
-        try {
-            await axios.post('/shop/products/add_product', { name, price, count });
-            alert('Продукт успешно добавлен!');
-            location.reload();
-        } catch (error) {
-            alert('Ошибка добавления продукта: ' + (error.response?.data?.detail || error.message));
         }
     });
 
@@ -232,7 +183,7 @@
         const productId = document.getElementById('deleteProductId').value;
 
         try {
-            const response =  await axios.delete(`/shop/buyers/buyer/delete/${productId}`);
+            const response =  await axios.delete(`/shop/products/buyer/delete/${productId}`);
             alert(response.data.message);
             location.reload();
         } catch (error) {
@@ -240,21 +191,6 @@
         }
     });
 
-    document.getElementById('editProductForm').addEventListener('submit', async function(event) {
-        event.preventDefault();
-        const product_id = document.getElementById('editProductId').value;
-        const name = document.getElementById('editProductName').value;
-        const price = document.getElementById('editProductPrice').value;
-        const count = document.getElementById('editProductCount').value;
-
-        try {
-            let response =  await axios.patch(`/shop/products/update_product/${product_id}`, { product_id, name, price, count });
-            alert(response.data.message);
-            location.reload();
-        } catch (error) {
-            alert('Ошибка обновления продукта: ' + (error.response?.data?.detail || error.message));
-        }
-    });
 
     </script>
 </body>
