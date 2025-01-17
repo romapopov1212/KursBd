@@ -8,7 +8,6 @@
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
-        <script src="/static/main.js"></script>
     </head>
 <body class="bg-light">
     <div class="container mt-5">
@@ -184,165 +183,167 @@
         </div>
 
     </div>
-
     <script>
-        function openAdminLoginForm(event) {
-            event.preventDefault();
-            const adminLoginModal = new bootstrap.Modal(document.getElementById('adminLoginModal'));
-            adminLoginModal.show();
-        }
+function openAdminLoginForm(event) {
+    event.preventDefault();
+    const adminLoginModal = new bootstrap.Modal(document.getElementById('adminLoginModal'));
+    adminLoginModal.show();
+}
 
-        function openRegisterForm(event) {
-            event.preventDefault();
-            const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
-            registerModal.show();
-        }
+function openRegisterForm(event) {
+    event.preventDefault();
+    const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+    registerModal.show();
+}
 
-        async function submitRegisterForm() {
-            const phone = document.getElementById('registerPhone').value;
-            const lastName = document.getElementById('registerLastName').value;
-            const firstName = document.getElementById('registerFirstName').value;
-            const middleName = document.getElementById('registerMiddleName').value;
+async function submitRegisterForm() {
+    const phone = document.getElementById('registerPhone').value;
+    const lastName = document.getElementById('registerLastName').value;
+    const firstName = document.getElementById('registerFirstName').value;
+    const middleName = document.getElementById('registerMiddleName').value;
 
-            try {
-                const response = await axios.post('/shop/buyers/buyer/add', {
-                    telephone_number:phone,
-                    surname:lastName,
-                    firstname:firstName,
-                    lastname:middleName
-                });
-
-                if (response.status === 200) {
-                    alert('Регистрация успешна!');
-
-                } else {
-                    alert('Ошибка регистрации: ' + (response.data.message || 'Неизвестная ошибка'));
-                }
-            } catch (error) {
-                const errorMessage = error.response?.data?.detail || error.message;
-                alert(`Ошибка регистрации: ${errorMessage}`);
-            }
-        }
-
-        async function submitAdminLoginForm() {
-            const username = document.getElementById('adminUsername').value;
-            const password = document.getElementById('adminPassword').value;
-
-            try {
-                const response = await axios.post('/shop/admin/login', {
-                    admin_name: username,
-                    admin_password: password
-                });
-
-                if (response.data.access_token) {
-                    window.location.href = 'admin_page';
-                    alert('Успешный вход!');
-                } else {
-                    alert('Ошибка входа: Невалидный ответ от сервера.');
-                }
-            } catch (error) {
-                const errorMessage = error.response?.data?.detail || error.message;
-                alert(`Ошибка входа: ${errorMessage}`);
-            }
-        }
-
-        function displayResults(data) {
-            const resultsContainer = document.getElementById('resultsContainer');
-            resultsContainer.style.display = 'block';
-            resultsContainer.innerHTML = `
-                <p><strong>ID:</strong> ${data.id || 'N/A'}</p>
-                <p><strong>Название:</strong> ${data.name || 'N/A'}</p>
-                <p><strong>Цена:</strong> ${data.price || 'N/A'}</p>
-                <p><strong>Количество:</strong> ${data.count || '0'}</p>
-            `;
-        }
-
-        document.getElementById('searchByNameForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const productName = document.getElementById('productName').value;
-
-            try {
-                const response = await axios.get(`/shop/products/product/name/${productName}`);
-                displayResults(response.data);
-            } catch (error) {
-                alert('Ошибка поиска: ' + (error.response?.data?.detail || error.message));
-            }
+    try {
+        const response = await axios.post('/shop/buyers/buyer/add', {
+            telephone_number:phone,
+            surname:lastName,
+            firstname:firstName,
+            lastname:middleName
         });
 
-        document.getElementById('searchByIdForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const productId = document.getElementById('productId').value;
+        if (response.status === 200) {
+            alert('Регистрация успешна!');
 
-            try {
-                const response = await axios.get(`/shop/products/product/id/${productId}`);
-                displayResults(response.data);
-            } catch (error) {
-                alert('Ошибка поиска: ' + (error.response?.data?.detail || error.message));
-            }
+        } else {
+            alert('Ошибка регистрации: ' + (response.data.message || 'Неизвестная ошибка'));
+        }
+    } catch (error) {
+        const errorMessage = error.response?.data?.detail || error.message;
+        alert(`Ошибка регистрации: ${errorMessage}`);
+    }
+}
+
+async function submitAdminLoginForm() {
+    const username = document.getElementById('adminUsername').value;
+    const password = document.getElementById('adminPassword').value;
+
+    try {
+        const response = await axios.post('/shop/admin/login', {
+            admin_name: username,
+            admin_password: password
         });
 
-
-        // Функция для открытия формы покупки
-        function makePurchase() {
-            const purchaseModal = new bootstrap.Modal(document.getElementById('purchaseModal'));
-            purchaseModal.show();
+        if (response.data.access_token) {
+            window.location.href = 'admin_page';
+            alert('Успешный вход!');
+        } else {
+            alert('Ошибка входа: Невалидный ответ от сервера.');
         }
+    } catch (error) {
+        const errorMessage = error.response?.data?.detail || error.message;
+        alert(`Ошибка входа: ${errorMessage}`);
+    }
+}
 
-        // Функция для добавления дополнительных полей продукта
-        function addProductFields() {
-            const container = document.getElementById('productFieldsContainer');
-            const productGroup = document.createElement('div');
-            productGroup.classList.add('product-group');
-            productGroup.innerHTML = `
-                <div class="form-group">
-                    <label>ID продукта</label>
-                    <input type="number" class="form-control product-id" placeholder="Введите ID продукта">
-                </div>
-                <div class="form-group">
-                    <label>Количество</label>
-                    <input type="number" class="form-control product-quantity" placeholder="Введите количество">
-                </div>
-            `;
-            container.appendChild(productGroup);
+function displayResults(data) {
+    const resultsContainer = document.getElementById('resultsContainer');
+    resultsContainer.style.display = 'block';
+    resultsContainer.innerHTML = `
+        <p><strong>ID:</strong> ${data.id || 'N/A'}</p>
+        <p><strong>Название:</strong> ${data.name || 'N/A'}</p>
+        <p><strong>Цена:</strong> ${data.price || 'N/A'}</p>
+        <p><strong>Количество:</strong> ${data.count || '0'}</p>
+    `;
+}
+
+document.getElementById('searchByNameForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    const productName = document.getElementById('productName').value;
+
+    try {
+        const response = await axios.get(`/shop/products/product/name/${productName}`);
+        displayResults(response.data);
+    } catch (error) {
+        alert('Ошибка поиска: ' + (error.response?.data?.detail || error.message));
+    }
+});
+
+document.getElementById('searchByIdForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    const productId = document.getElementById('productId').value;
+
+    try {
+        const response = await axios.get(`/shop/products/product/id/${productId}`);
+        displayResults(response.data);
+    } catch (error) {
+        alert('Ошибка поиска: ' + (error.response?.data?.detail || error.message));
+    }
+});
+
+
+// Функция для открытия формы покупки
+function makePurchase() {
+    const purchaseModal = new bootstrap.Modal(document.getElementById('purchaseModal'));
+    purchaseModal.show();
+}
+
+// Функция для добавления дополнительных полей продукта
+function addProductFields() {
+    const container = document.getElementById('productFieldsContainer');
+    const productGroup = document.createElement('div');
+    productGroup.classList.add('product-group');
+    productGroup.innerHTML = `
+        <div class="form-group">
+            <label>ID продукта</label>
+            <input type="number" class="form-control product-id" placeholder="Введите ID продукта">
+        </div>
+        <div class="form-group">
+            <label>Количество</label>
+            <input type="number" class="form-control product-quantity" placeholder="Введите количество">
+        </div>
+    `;
+    container.appendChild(productGroup);
+}
+
+// Функция для отправки формы покупки
+async function submitPurchaseForm() {
+    const phone = document.getElementById('purchasePhone').value;
+    const productGroups = document.querySelectorAll('.product-group');
+
+    if (!phone || productGroups.length === 0) {
+        alert('Пожалуйста, заполните все обязательные поля.');
+        return;
+    }
+
+    const products = Array.from(productGroups).map(group => {
+        const productId = group.querySelector('.product-id').value;
+        const count = group.querySelector('.product-quantity').value;
+        if (!productId || !count) {
+            throw new Error('Все поля продукта должны быть заполнены.');
         }
+        return {
+            product_id: parseInt(productId, 10),
+            count: parseInt(count, 10)
+        };
+    });
 
-        // Функция для отправки формы покупки
-        async function submitPurchaseForm() {
-            const phone = document.getElementById('purchasePhone').value;
-            const productGroups = document.querySelectorAll('.product-group');
+    try {
+        const response = await axios.post('/shop/purchases/purchase', {
+            buyer_number: phone,
+            products: products
+        });
 
-            if (!phone || productGroups.length === 0) {
-                alert('Пожалуйста, заполните все обязательные поля.');
-                return;
-            }
-
-            const products = Array.from(productGroups).map(group => {
-                const productId = group.querySelector('.product-id').value;
-                const count = group.querySelector('.product-quantity').value;
-                if (!productId || !count) {
-                    throw new Error('Все поля продукта должны быть заполнены.');
-                }
-                return {
-                    product_id: parseInt(productId, 10),
-                    count: parseInt(count, 10)
-                };
-            });
-
-            try {
-                const response = await axios.post('/shop/purchases/purchase', {
-                    buyer_number: phone,
-                    products: products
-                });
-
-                if (response.status === 200) {
-                    alert('Покупка успешно совершена!');
-                    window.location.href = 'products_page';
-                } else {
-                    alert('Ошибка при совершении покупки: ' + (response.data.message || 'Неизвестная ошибка'));
-                }
-            } catch (error) {
-                const errorMessage = error.response?.data?.detail || error.message;
-                alert(`Ошибка при совершении покупки: ${errorMessage}`);
-            }
+        if (response.status === 200) {
+            alert('Покупка успешно совершена!');
+            window.location.href = 'products_page';
+        } else {
+            alert('Ошибка при совершении покупки: ' + (response.data.message || 'Неизвестная ошибка'));
         }
+    } catch (error) {
+        const errorMessage = error.response?.data?.detail || error.message;
+        alert(`Ошибка при совершении покупки: ${errorMessage}`);
+    }
+}
+
     </script>
+    </body>
+    </html>

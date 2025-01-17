@@ -44,14 +44,75 @@
                 </table>
             </div>
         </div>
+
+        <div class="mb-4">
+            <h2>Поиск продукта по названию</h2>
+            <form id="searchByNameForm">
+                <div class="form-group">
+                    <label for="productName">Название продукта:</label>
+                    <input type="text" class="form-control" id="productName" placeholder="Введите название продукта">
+                </div>
+                <button type="submit" class="btn btn-primary">Искать</button>
+            </form>
+        </div>
+        <!-- ПОИСК ПО id -->
+        <div class="mb-4">
+            <h2>Поиск продукта по ID</h2>
+            <form id="searchByIdForm">
+                <div class="form-group">
+                    <label for="productId">ID продукта:</label>
+                    <input type="number" class="form-control" id="productId" placeholder="Введите ID продукта">
+                </div>
+                <button type="submit" class="btn btn-primary">Искать</button>
+            </form>
+        </div>
+        <!--  РЕЗУЛЬТАТ ПОИСКА  -->
+        <div id="searchResults" class="mt-5">
+            <h3>Результаты поиска</h3>
+            <div id="resultsContainer" class="alert alert-info" style="display: none;"></div>
+        </div>
+
     </div>
     <script>
         function redirectToProductsPage(event) {
             event.preventDefault();
-            // document.cookies = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
             document.cookie = "token=; path=/; domain=" + window.location.hostname + "; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
             window.location.href = "products_page";
         }
+
+        function displayResults(data) {
+        const resultsContainer = document.getElementById('resultsContainer');
+        resultsContainer.style.display = 'block';
+        resultsContainer.innerHTML = `
+            <p><strong>ID:</strong> ${data.id || 'N/A'}</p>
+            <p><strong>Название:</strong> ${data.name || 'N/A'}</p>
+            <p><strong>Цена:</strong> ${data.price || 'N/A'}</p>
+            <p><strong>Количество:</strong> ${data.count || '0'}</p>
+        `;
+    }
+    document.getElementById('searchByNameForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    const productName = document.getElementById('productName').value;
+
+    try {
+        const response = await axios.get(`/shop/products/product/name/${productName}`);
+        displayResults(response.data);
+    } catch (error) {
+        alert('Ошибка поиска: ' + (error.response?.data?.detail || error.message));
+    }
+    });
+
+    document.getElementById('searchByIdForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const productId = document.getElementById('productId').value;
+
+        try {
+            const response = await axios.get(`/shop/products/product/id/${productId}`);
+            displayResults(response.data);
+        } catch (error) {
+            alert('Ошибка поиска: ' + (error.response?.data?.detail || error.message));
+        }
+    });
     </script>
 </body>
 </html>
