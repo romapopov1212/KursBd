@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Магазин</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script src="/static/main.js"></script>
+</head>
+
+<body class="bg-light d-lg-grid">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10 p-md-0">
+                <!-- Верхний правый угол -->
+                <div class="d-flex justify-content-end mb-3">
+                    <a href="#" class="btn btn-danger" onclick="redirectToProductsPage(event)">Выйти из аккаунта администратора</a>
+                </div>
+                
+                <h1 class="text-center mb-4">Список всех покупателей</h1>
+                <table class="table table-striped text-center">
+                    <thead>
+                        <tr>
+                            <th>Номер телефона</th>
+                            <th>Фамилия</th>
+                            <th>Имя</th>
+                            <th>Отчество</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for buyer in buyers %}
+                        <tr>
+                            <td>{{ buyer.telephone_number }}</td>
+                            <td>{{ buyer.surname }}</td>
+                            <td>{{ buyer.name }}</td>
+                            <td>{{ buyer.lastname }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <!-- Форма удаления покупателя -->
+                <div class="mt-4">
+                    <h2>Удалить покупателя</h2>
+                    <form id="deleteProductForm">
+                        <div class="form-group">
+                            <label for="deleteProductId">Номер телефона:</label>
+                            <input type="number" class="form-control" id="deleteProductId" placeholder="Введите номер телефона покупателя">
+                        </div>
+                        <button type="submit" class="btn btn-danger">Удалить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <!-- Поиск покупателя -->
+            <div class="col-md-6">
+                <h2>Поиск продукта</h2>
+                <form id="searchByNameForm" class="mb-3">
+                    <div class="form-group">
+                        <label for="productName">Название продукта:</label>
+                        <input type="text" class="form-control" id="productName" placeholder="Введите название продукта">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Искать</button>
+                </form>
+                <form id="searchByIdForm">
+                    <div class="form-group">
+                        <label for="productId">ID продукта:</label>
+                        <input type="number" class="form-control" id="productId" placeholder="Введите ID продукта">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Искать</button>
+                </form>
+                <div id="searchResults" class="mt-3">
+                    <h5>Результаты поиска</h5>
+                    <div id="resultsContainer" class="alert alert-info" style="display: none; font-size: 0.9rem; padding: 0.5rem;"></div>
+                </div>
+            </div>
+            <!-- Добавление продукта -->
+            <div class="col-md-6">
+                <h2>Добавить продукт</h2>
+                <form id="addProductForm">
+                    <div class="form-group">
+                        <label for="newProductName">Имя:</label>
+                        <input type="text" class="form-control" id="newProductName" placeholder="Введите имя продукта">
+                    </div>
+                    <div class="form-group">
+                        <label for="newProductPrice">Цена:</label>
+                        <input type="number" class="form-control" id="newProductPrice" placeholder="Введите цену">
+                    </div>
+                    <div class="form-group">
+                        <label for="newProductCount">Количество:</label>
+                        <input type="number" class="form-control" id="newProductCount" placeholder="Введите количество">
+                    </div>
+                    <button type="submit" class="btn btn-success">Добавить</button>
+                </form>
+                <h2 class="mt-4">Добавить покупателя</h2>
+                <form id="addCustomerForm">
+                    <div class="form-group">
+                        <label for="customerPhone">Телефон:</label>
+                        <input type="text" class="form-control" id="customerPhone" placeholder="Введите телефон">
+                    </div>
+                    <div class="form-group">
+                        <label for="customerFirstName">Имя:</label>
+                        <input type="text" class="form-control" id="customerFirstName" placeholder="Введите имя">
+                    </div>
+                    <div class="form-group">
+                        <label for="customerLastName">Фамилия:</label>
+                        <input type="text" class="form-control" id="customerLastName" placeholder="Введите фамилию">
+                    </div>
+                    <div class="form-group">
+                        <label for="customerMiddleName">Отчество:</label>
+                        <input type="text" class="form-control" id="customerMiddleName" placeholder="Введите отчество">
+                    </div>
+                    <button type="submit" class="btn btn-success">Добавить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProductModalLabel">Редактировать товар</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editProductForm">
+                        <div class="form-group">
+                            <label for="editProductId">ID:</label>
+                            <input type="number" class="form-control" id="editProductId" placeholder="Введите ID">
+                        </div>
+                        <div class="form-group">
+                            <label for="editProductName">Имя:</label>
+                            <input type="text" class="form-control" id="editProductName" placeholder="Введите имя">
+                        </div>
+                        <div class="form-group">
+                            <label for="editProductPrice">Цена:</label>
+                            <input type="number" class="form-control" id="editProductPrice" placeholder="Введите цену">
+                        </div>
+                        <div class="form-group">
+                            <label for="editProductCount">Количество:</label>
+                            <input type="number" class="form-control" id="editProductCount" placeholder="Введите количество">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function redirectToProductsPage(event) {
+            event.preventDefault();
+            document.cookie = "token=; path=/; domain=" + window.location.hostname + "; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+            window.location.href = "products_page";
+        }
+
+        function displayResults(data) {
+        const resultsContainer = document.getElementById('resultsContainer');
+        resultsContainer.style.display = 'block';
+        resultsContainer.innerHTML = `
+            <p><strong>ID:</strong> ${data.id || 'N/A'}</p>
+            <p><strong>Название:</strong> ${data.name || 'N/A'}</p>
+            <p><strong>Цена:</strong> ${data.price || 'N/A'}</p>
+            <p><strong>Количество:</strong> ${data.count || '0'}</p>
+        `;
+    }
+    document.getElementById('searchByNameForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    const productName = document.getElementById('productName').value;
+
+    try {
+        const response = await axios.get(`/shop/products/product/name/${productName}`);
+        displayResults(response.data);
+    } catch (error) {
+        alert('Ошибка поиска: ' + (error.response?.data?.detail || error.message));
+    }
+    });
+
+    document.getElementById('searchByIdForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const productId = document.getElementById('productId').value;
+
+        try {
+            const response = await axios.get(`/shop/products/product/id/${productId}`);
+            displayResults(response.data);
+        } catch (error) {
+            alert('Ошибка поиска: ' + (error.response?.data?.detail || error.message));
+        }
+    });
+
+    document.getElementById('addProductForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const name = document.getElementById('newProductName').value;
+        const price = document.getElementById('newProductPrice').value;
+        const count = document.getElementById('newProductCount').value;
+
+        try {
+            await axios.post('/shop/products/add_product', { name, price, count });
+            alert('Продукт успешно добавлен!');
+            location.reload();
+        } catch (error) {
+            alert('Ошибка добавления продукта: ' + (error.response?.data?.detail || error.message));
+        }
+    });
+
+    document.getElementById('addCustomerForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const telephone_number = document.getElementById('customerPhone').value;
+        const firstname = document.getElementById('customerFirstName').value;
+        const surname = document.getElementById('customerLastName').value;
+        const lastname = document.getElementById('customerMiddleName').value;
+
+        try {
+            await axios.post('/shop/buyers/buyer/add', { telephone_number, firstname, surname, lastname });
+            alert('Покупатель успешно добавлен!');
+            location.reload();
+        } catch (error) {
+            alert('Ошибка добавления покупателя: ' + (error.response?.data?.detail || error.message));
+        }
+    });
+
+    document.getElementById('deleteProductForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const productId = document.getElementById('deleteProductId').value;
+
+        try {
+            const response =  await axios.delete(`/shop/buyers/buyer/delete/${productId}`);
+            alert(response.data.message);
+            location.reload();
+        } catch (error) {
+            alert('Ошибка удаления продукта: ' + (error.response?.data?.detail || error.message));
+        }
+    });
+
+    document.getElementById('editProductForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const product_id = document.getElementById('editProductId').value;
+        const name = document.getElementById('editProductName').value;
+        const price = document.getElementById('editProductPrice').value;
+        const count = document.getElementById('editProductCount').value;
+
+        try {
+            let response =  await axios.patch(`/shop/products/update_product/${product_id}`, { product_id, name, price, count });
+            alert(response.data.message);
+            location.reload();
+        } catch (error) {
+            alert('Ошибка обновления продукта: ' + (error.response?.data?.detail || error.message));
+        }
+    });
+
+    </script>
+</body>
+</html>
