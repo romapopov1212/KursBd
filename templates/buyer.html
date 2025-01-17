@@ -9,6 +9,18 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
     <script src="/static/main.js"></script>
+    <style>
+        .nav-button {
+            font-size: 1.2rem;
+            padding: 0.5rem 1rem;
+            margin: 0.5rem 0;
+            border-radius: 5px;
+        }
+        .nav-button:hover {
+            text-decoration: none;
+            opacity: 0.9;
+        }
+    </style>
 </head>
 
 <body class="bg-light d-lg-grid">
@@ -16,10 +28,14 @@
         <div class="row justify-content-center">
             <div class="col-md-10 p-md-0">
                 <!-- Верхний правый угол -->
-                <div class="d-flex justify-content-end mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex">
+                        <a href="/shop/products/admin_page" class="btn btn-info nav-button">Начальная страница</a>
+                        <a href="#" class="btn btn-secondary nav-button ml-2">Покупки</a>
+                    </div>
                     <a href="#" class="btn btn-danger" onclick="redirectToProductsPage(event)">Выйти из аккаунта администратора</a>
+                   
                 </div>
-                
                 <h1 class="text-center mb-4">Список всех покупателей</h1>
                 <table class="table table-striped text-center">
                     <thead>
@@ -44,7 +60,7 @@
                 </table>
 
                 <!-- Форма удаления покупателя -->
-                <div class="mt-4">
+                <div class="mt-4 mb-3">
                     <h2>Удалить покупателя</h2>
                     <form id="deleteProductForm">
                         <div class="form-group">
@@ -59,7 +75,7 @@
 
         <div class="row mb-4">
             <!-- Поиск покупателя -->
-            <div class="col-md-6">
+            <div class="col-md-6 mt-4">
                 <h2>Поиск покупателя</h2>
                 
                 <form id="searchByIdForm">

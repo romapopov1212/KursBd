@@ -9,6 +9,18 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
     <script src="/static/main.js"></script>
+    <style>
+        .nav-button {
+            font-size: 1.2rem;
+            padding: 0.5rem 1rem;
+            margin: 0.5rem 0;
+            border-radius: 5px;
+        }
+        .nav-button:hover {
+            text-decoration: none;
+            opacity: 0.9;
+        }
+    </style>
 </head>
 
 <body class="bg-light d-lg-grid">
@@ -16,8 +28,13 @@
         <div class="row justify-content-center">
             <div class="col-md-10 p-md-0">
                 <!-- Верхний правый угол -->
-                <div class="d-flex justify-content-end mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex">
+                        <a href="/shop/products/buyers_page" class="btn btn-info nav-button">Покупатели</a>
+                        <a href="#" class="btn btn-secondary nav-button ml-2">Покупки</a>
+                    </div>
                     <a href="#" class="btn btn-danger" onclick="redirectToProductsPage(event)">Выйти из аккаунта администратора</a>
+                   
                 </div>
                 
                 <div class="d-flex justify-content-start mb-3">
@@ -102,26 +119,7 @@
                     </div>
                     <button type="submit" class="btn btn-success">Добавить</button>
                 </form>
-                <h2 class="mt-4">Добавить покупателя</h2>
-                <form id="addCustomerForm">
-                    <div class="form-group">
-                        <label for="customerPhone">Телефон:</label>
-                        <input type="text" class="form-control" id="customerPhone" placeholder="Введите телефон">
-                    </div>
-                    <div class="form-group">
-                        <label for="customerFirstName">Имя:</label>
-                        <input type="text" class="form-control" id="customerFirstName" placeholder="Введите имя">
-                    </div>
-                    <div class="form-group">
-                        <label for="customerLastName">Фамилия:</label>
-                        <input type="text" class="form-control" id="customerLastName" placeholder="Введите фамилию">
-                    </div>
-                    <div class="form-group">
-                        <label for="customerMiddleName">Отчество:</label>
-                        <input type="text" class="form-control" id="customerMiddleName" placeholder="Введите отчество">
-                    </div>
-                    <button type="submit" class="btn btn-success">Добавить</button>
-                </form>
+                
             </div>
         </div>
     </div>
@@ -215,21 +213,6 @@
         }
     });
 
-    document.getElementById('addCustomerForm').addEventListener('submit', async function(event) {
-        event.preventDefault();
-        const telephone_number = document.getElementById('customerPhone').value;
-        const firstname = document.getElementById('customerFirstName').value;
-        const surname = document.getElementById('customerLastName').value;
-        const lastname = document.getElementById('customerMiddleName').value;
-
-        try {
-            await axios.post('/shop/buyers/buyer/add', { telephone_number, firstname, surname, lastname });
-            alert('Покупатель успешно добавлен!');
-            location.reload();
-        } catch (error) {
-            alert('Ошибка добавления покупателя: ' + (error.response?.data?.detail || error.message));
-        }
-    });
 
     document.getElementById('deleteProductForm').addEventListener('submit', async function(event) {
         event.preventDefault();
