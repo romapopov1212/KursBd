@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Магазин</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script src="/static/main.js"></script>
+    <style>
+        .nav-button {
+            font-size: 1.2rem;
+            padding: 0.5rem 1rem;
+            margin: 0.5rem 0;
+            border-radius: 5px;
+        }
+        .nav-button:hover {
+            text-decoration: none;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+
+<body class="bg-light d-lg-grid">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10 p-md-0">
+                <!-- Верхний правый угол -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex">
+                        <a href="/shop/products/admin_page" class="btn btn-info nav-button">Начальная страница</a>
+                        <a href="/shop/products/buyers_page" class="btn btn-secondary nav-button ml-2">Покупатели</a>
+                    </div>
+                    <a href="#" class="btn btn-danger" onclick="redirectToProductsPage(event)">Выйти из аккаунта администратора</a>
+                   
+                </div>
+                
+                
+                <h1 class="text-center mb-4">Список всех покупок в магазине</h1>
+                <div class="row">
+                    <!-- Первая таблица -->
+                    <div class="col-md-6">
+                        <h3 class="text-center">Список покупок</h3>
+                        <table class="table table-striped text-center">
+                            <thead>
+                                <tr>
+                                    <th>ID покупки</th>
+                                    <th>Дата</th>
+                                    <th>Номер телефона покупателя</th>
+                                    <th>Полная стоимость</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pur in purchase %}
+                                <tr>
+                                    <td>{{ pur.id_purchase }}</td>
+                                    <td>{{ pur.date }}</td>
+                                    <td>{{ pur.buyer_number }}</td>
+                                    <td>{{ pur.full_price }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Вторая таблица -->
+                    <div class="col-md-6">
+                        <h3 class="text-center">Список купленных товаров </h3>
+                        <table class="table table-striped text-center">
+                            <thead>
+                                <tr>
+                                    <th>ID продукта</th>
+                                    <th>ID покупки</th>
+                                    <th>Количество</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for purProd in purProds %}
+                                <tr>
+                                    <td>{{ purProd.id_product }}</td>
+                                    <td>{{ purProd.id_purchase }}</td>
+                                    <td>{{ purProd.count }}</td>
+                                    
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Форма удаления продукта -->
+                <div class="mt-4">
+                    <h2>Удалить покупку</h2>
+                    <form id="deleteProductForm">
+                        <div class="form-group">
+                            <label for="deleteProductId">ID покупки:</label>
+                            <input type="number" class="form-control" id="deleteProductId" placeholder="Введите ID покупки">
+                        </div>
+                        <button type="submit" class="btn btn-danger">Удалить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+       
+    <script>
+        function redirectToProductsPage(event) {
+            event.preventDefault();
+            document.cookie = "token=; path=/; domain=" + window.location.hostname + "; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+            window.location.href = "products_page";
+        }
+
+    document.getElementById('deleteProductForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const productId = document.getElementById('deleteProductId').value;
+
+        try {
+            const response =  await axios.delete(`/shop/products/purchase/delete_by_id/${productId}`);
+            alert(response.data.message);
+            location.reload();
+        } catch (error) {
+            alert('Ошибка удаления продукта: ' + (error.response?.data?.detail || error.message));
+        }
+    });
+
+
+    </script>
+</body>
+</html>

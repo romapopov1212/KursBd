@@ -100,10 +100,11 @@ class PurchaseService:
 
     async def get_list(
             self,
-            credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
+            token: str
+            #credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
     ) -> List[tables.Purchase]:
 
-        current_user = self.admin_service.get_current_user(credentials)
+        current_user = self.admin_service.get_current_user(token)
         if current_user != settings.admin_name:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -123,9 +124,10 @@ class PurchaseService:
 
     async def get_purchaseProduct_list(
             self, 
-            credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
+            token: str
+            #credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
     ) -> List[tables.PurchasedProducts]:
-        current_user = self.admin_service.get_current_user(credentials)
+        current_user = self.admin_service.get_current_user(token)
         if current_user != settings.admin_name:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -146,10 +148,11 @@ class PurchaseService:
     async def delete_purchase_by_id(
             self,
             purchase_id: int,
-            credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
+            token:str
+            #credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
     ):
 
-        current_user = self.admin_service.get_current_user(credentials)
+        current_user = self.admin_service.get_current_user(token)
         if current_user != settings.admin_name:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,

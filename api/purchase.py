@@ -1,13 +1,18 @@
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPAuthorizationCredentials
+from fastapi.requests import Request
 
+from services.admin_token import AdminService
+from fastapi.templating import Jinja2Templates
 from models.purchase import Purchase
 from services.purchase import PurchaseService
 from services.admin_token import http_bearer
 
 
+template = Jinja2Templates(directory="templates")
+
 router = APIRouter(
-    prefix="/shop/purchases",
+    prefix="/shop/products",
     tags=['purchase']
 )
 
@@ -23,24 +28,43 @@ async def create_purchase(
         products_to_buy=purchase.products,
     )
 
-@router.get("/all")
+@router.get("/Purchase/all")
 async def get_all_purchase(
         service: PurchaseService = Depends(),
-        credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
+        admin_service: AdminService = Depends(),
+        request: Request = None,
 ):
-    return await service.get_list(credentials)
+    t = admin_service.get_cooks_and_check_is_admin(request=request)
+    return await service.get_list(t)
 
 @router.get("/allPurcashedProduct")
 async def get_all_purchaseProducts(
         service: PurchaseService = Depends(),
-        credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
+        admin_service: AdminService = Depends(),
+        request: Request = None,
+        
 ):
-    return await service.get_purchaseProduct_list(credentials)
+    t = admin_service.get_cooks_and_check_is_admin(request=request)
+    return await service.get_purchaseProduct_list(t)
 
 @router.delete("/purchase/delete_by_id/{purchase_id}")
 async def del_purchase(
         purchase_id: int,
         service: PurchaseService = Depends(),
-        credentials: HTTPAuthorizationCredentials = Depends(http_bearer),
+        admin_service: AdminService = Depends(),
+        request: Request = None,
 ):
-    return await service.delete_purchase_by_id(purchase_id, credentials)
+    t = admin_service.get_cooks_and_check_is_admin(request=request)
+    return await service.delete_purchase_by_id(purchase_id, t)
+
+
+@router.get("/purchase_page")
+async def get_page(
+    request: Request,
+    service: PurchaseService = Depends(),
+    admin_service: AdminService = Depends()
+):
+    t = admin_service.get_cooks_and_check_is_admin(request=request)
+    pur = await service.get_list(t)
+    purProd = await service.get_purchaseProduct_list(t)
+    return template.TemplateResponse("purchase.html", {"request": request, "purchase" : pur, "purProds" : purProd})
