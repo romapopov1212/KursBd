@@ -327,7 +327,7 @@ async function submitPurchaseForm() {
     });
 
     try {
-        const response = await axios.post('/shop/purchases/purchase', {
+        const response = await axios.post('/shop/products/purchase', {
             buyer_number: phone,
             products: products
         });
