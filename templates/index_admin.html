@@ -32,15 +32,16 @@
                     <div class="d-flex">
                         <a href="/shop/products/buyers_page" class="btn btn-secondary nav-button">Покупатели</a>
                         <a href="/shop/products/purchase_page" class="btn btn-secondary nav-button ml-2">Покупки</a>
-                        <a href="#" class="btn btn-secondary nav-button ml-2" data-toggle="modal" data-target="#reportModal">Составить отчет о покупках</a>
+                        <a href="/shop/products/report_page" class="btn btn-secondary nav-button ml-2">Составить отчет о покупках</a>
                     </div>
                     <a href="#" class="btn btn-danger" onclick="redirectToProductsPage(event)">Выйти из аккаунта администратора</a>
+                   
                 </div>
-
+                
                 <div class="d-flex justify-content-start mb-3">
                     <button class="btn btn-primary" data-toggle="modal" data-target="#editProductModal">Редактировать товар</button>
                 </div>
-
+                
                 <h1 class="text-center mb-4">Список всех товаров</h1>
                 <table class="table table-striped text-center">
                     <thead>
@@ -119,33 +120,44 @@
                     </div>
                     <button type="submit" class="btn btn-success">Добавить</button>
                 </form>
+                
             </div>
         </div>
     </div>
 
-    <!-- Модальное окно для ввода номера телефона -->
-    <div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="reportModalLabel">Составить отчет о покупках</h5>
+                    <h5 class="modal-title" id="editProductModalLabel">Редактировать товар</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="reportForm">
+                    <form id="editProductForm">
                         <div class="form-group">
-                            <label for="customerPhone">Номер телефона покупателя:</label>
-                            <input type="tel" class="form-control" id="customerPhone" placeholder="Введите номер телефона" required>
+                            <label for="editProductId">ID:</label>
+                            <input type="number" class="form-control" id="editProductId" placeholder="Введите ID">
                         </div>
-                        <button type="submit" class="btn btn-primary">Создать отчет</button>
+                        <div class="form-group">
+                            <label for="editProductName">Название:</label>
+                            <input type="text" class="form-control" id="editProductName" placeholder="Введите название товара">
+                        </div>
+                        <div class="form-group">
+                            <label for="editProductPrice">Цена:</label>
+                            <input type="number" class="form-control" id="editProductPrice" placeholder="Введите цену">
+                        </div>
+                        <div class="form-group">
+                            <label for="editProductCount">Количество:</label>
+                            <input type="number" class="form-control" id="editProductCount" placeholder="Введите количество">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
     <script>
         function redirectToProductsPage(event) {
             event.preventDefault();
@@ -154,98 +166,84 @@
         }
 
         function displayResults(data) {
-            const resultsContainer = document.getElementById('resultsContainer');
-            resultsContainer.style.display = 'block';
-            resultsContainer.innerHTML = `
-                <p><strong>ID:</strong> ${data.id || 'N/A'}</p>
-                <p><strong>Название:</strong> ${data.name || 'N/A'}</p>
-                <p><strong>Цена:</strong> ${data.price || 'N/A'}</p>
-                <p><strong>Количество:</strong> ${data.count || '0'}</p>
-            `;
+        const resultsContainer = document.getElementById('resultsContainer');
+        resultsContainer.style.display = 'block';
+        resultsContainer.innerHTML = `
+            <p><strong>ID:</strong> ${data.id || 'N/A'}</p>
+            <p><strong>Название:</strong> ${data.name || 'N/A'}</p>
+            <p><strong>Цена:</strong> ${data.price || 'N/A'}</p>
+            <p><strong>Количество:</strong> ${data.count || '0'}</p>
+        `;
+    }
+    document.getElementById('searchByNameForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    const productName = document.getElementById('productName').value;
+
+    try {
+        const response = await axios.get(`/shop/products/product/name/${productName}`);
+        displayResults(response.data);
+    } catch (error) {
+        alert('Ошибка поиска: ' + (error.response?.data?.detail || error.message));
+    }
+    });
+
+    document.getElementById('searchByIdForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const productId = document.getElementById('productId').value;
+
+        try {
+            const response = await axios.get(`/shop/products/product/id/${productId}`);
+            displayResults(response.data);
+        } catch (error) {
+            alert('Ошибка поиска: ' + (error.response?.data?.detail || error.message));
         }
+    });
 
-        document.getElementById('searchByNameForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const productName = document.getElementById('productName').value;
+    document.getElementById('addProductForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const name = document.getElementById('newProductName').value;
+        const price = document.getElementById('newProductPrice').value;
+        const count = document.getElementById('newProductCount').value;
 
-            try {
-                const response = await axios.get(`/shop/products/product/name/${productName}`);
-                displayResults(response.data);
-            } catch (error) {
-                alert('Ошибка поиска: ' + (error.response?.data?.detail || error.message));
-            }
-        });
+        try {
+            await axios.post('/shop/products/add_product', { name, price, count });
+            alert('Продукт успешно добавлен!');
+            location.reload();
+        } catch (error) {
+            alert('Ошибка добавления продукта: ' + (error.response?.data?.detail || error.message));
+        }
+    });
 
-        document.getElementById('searchByIdForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const productId = document.getElementById('productId').value;
 
-            try {
-                const response = await axios.get(`/shop/products/product/id/${productId}`);
-                displayResults(response.data);
-            } catch (error) {
-                alert('Ошибка поиска: ' + (error.response?.data?.detail || error.message));
-            }
-        });
+    document.getElementById('deleteProductForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const productId = document.getElementById('deleteProductId').value;
 
-        document.getElementById('addProductForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const name = document.getElementById('newProductName').value;
-            const price = document.getElementById('newProductPrice').value;
-            const count = document.getElementById('newProductCount').value;
+        try {
+            const response =  await axios.delete(`/shop/products/delete_product/id/${productId}`);
+            alert(response.data.message);
+            location.reload();
+        } catch (error) {
+            alert('Ошибка удаления продукта: ' + (error.response?.data?.detail || error.message));
+        }
+    });
 
-            try {
-                await axios.post('/shop/products/add_product', { name, price, count });
-                alert('Продукт успешно добавлен!');
-                location.reload();
-            } catch (error) {
-                alert('Ошибка добавления продукта: ' + (error.response?.data?.detail || error.message));
-            }
-        });
+    document.getElementById('editProductForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const product_id = document.getElementById('editProductId').value;
+        const name = document.getElementById('editProductName').value;
+        const price = document.getElementById('editProductPrice').value;
+        const count = document.getElementById('editProductCount').value;
 
-        document.getElementById('deleteProductForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const productId = document.getElementById('deleteProductId').value;
+        try {
+            let response =  await axios.patch(`/shop/products/update_product/${product_id}`, { product_id, name, price, count });
+            alert(response.data.message);
+            location.reload();
+        } catch (error) {
+            alert('Ошибка обновления продукта: ' + (error.response?.data?.detail || error.message));
+        }
+    });
 
-            try {
-                const response = await axios.delete(`/shop/products/delete_product/id/${productId}`);
-                alert(response.data.message);
-                location.reload();
-            } catch (error) {
-                alert('Ошибка удаления продукта: ' + (error.response?.data?.detail || error.message));
-            }
-        });
-
-        document.getElementById('editProductForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const product_id = document.getElementById('editProductId').value;
-            const name = document.getElementById('editProductName').value;
-            const price = document.getElementById('editProductPrice').value;
-            const count = document.getElementById('editProductCount').value;
-
-            try {
-                let response = await axios.patch(`/shop/products/update_product/${product_id}`, { product_id, name, price, count });
-                alert(response.data.message);
-                location.reload();
-            } catch (error) {
-                alert('Ошибка обновления продукта: ' + (error.response?.data?.detail || error.message));
-            }
-        });
-
-        // Обработчик формы для составления отчета о покупках
-        document.getElementById('reportForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const customerPhone = document.getElementById('customerPhone').value;
-
-            try {
-                // Тут можно отправить запрос на создание отчета
-                const response = await axios.post('/shop/products/create_report', { phone: customerPhone });
-                alert('Отчет успешно создан!');
-                $('#reportModal').modal('hide'); // Закрытие модального окна
-            } catch (error) {
-                alert('Ошибка при создании отчета: ' + (error.response?.data?.detail || error.message));
-            }
-        });
     </script>
 </body>
 </html>
