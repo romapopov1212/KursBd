@@ -68,3 +68,24 @@ async def get_page(
     pur = await service.get_list(t)
     purProd = await service.get_purchaseProduct_list(t)
     return template.TemplateResponse("purchase.html", {"request": request, "purchase" : pur, "purProds" : purProd})
+
+
+@router.get("/report/{telephone_number}")
+async def get_report(
+    telephone_number: str,
+    request: Request,
+    service: PurchaseService = Depends(),
+    admin_service: AdminService = Depends(),
+):
+    t = admin_service.get_cooks_and_check_is_admin(request=request)
+    return await service.get_report(telephone_number, token=t)
+
+
+@router.get("/report_page")
+async def get_report_page(
+    request: Request,
+    service: PurchaseService = Depends(),
+    admin_service: AdminService = Depends()
+):
+    t = admin_service.get_cooks_and_check_is_admin(request=request)
+    return template.TemplateResponse("report.html", {"request": request})

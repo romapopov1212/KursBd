@@ -45,7 +45,7 @@ async def get_by_number(
     t = admin_service.get_cooks_and_check_is_admin(request=request)
     return await service.get_by_number(telephone_number, t)
 
-@router.get("/all")
+@router.get("/all_buyers")
 async def get_all_buyers(
         service:BuyersService=Depends(),
         request: Request = None,

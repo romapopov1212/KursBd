@@ -178,3 +178,69 @@ class PurchaseService:
             content={"message" : "Покупка удалена успешно."}
         )
 
+    async def get_report(
+        self,
+        buyer_number: str,
+        token: str
+    ):
+        # Проверка прав доступа
+        current_user = self.admin_service.get_current_user(token)
+        if current_user != settings.admin_name:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Недостаточно прав для выполнения действия"
+            )
+
+        # Получаем все покупки покупателя
+        buyer = await self.session.get(tables.Buyers, buyer_number)
+        if not buyer:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Покупатель с таким номером телефона не найден."
+            )
+
+        stmt = select(tables.Purchase).where(tables.Purchase.buyer_number == buyer_number)
+        result = await self.session.execute(stmt)
+        purchases = result.scalars().all()
+
+        if not purchases:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="У покупателя нет совершенных покупок."
+            )
+
+        # Собираем данные для отчета
+        report = []
+        for purchase in purchases:
+            # Получаем информацию о продуктах, купленных в рамках этой покупки
+            stmt = select(tables.PurchasedProducts).where(tables.PurchasedProducts.id_purchase == purchase.id_purchase)
+            result = await self.session.execute(stmt)
+            purchased_products = result.scalars().all()
+
+            products_details = []
+            for purchased_product in purchased_products:
+                product = await self.service.get_product_by_id(purchased_product.id_product)
+                products_details.append({
+                    "product_name": product.name,
+                    "count": purchased_product.count,
+                    "price_per_item": float(product.price),
+                    "total_price": float(product.price * purchased_product.count)
+                })
+
+            report.append({
+                "purchase_id": purchase.id_purchase,
+                "date": purchase.date,
+                "full_price": float(purchase.full_price),
+                "products": products_details
+            })
+
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={
+                "message": "Отчет о покупках покупателя",
+                "buyer_number": buyer_number,
+                "purchases": report
+            }
+        )
+
+            
