@@ -110,40 +110,40 @@
             window.location.href = "products_page";
         }
 
-        // function showPurchases(phoneNumber) {
-        //     const purchasesRow = document.getElementById('purchases_' + phoneNumber);
-        //     const purchaseDetailsContainer = document.getElementById('purchaseDetails_' + phoneNumber);
-        //     axios.post('/get_purchases', { phone_number: phoneNumber })
-        //         .then(function (response) {
-        //             const data = response.data;
-        //             if (data.purchases && data.purchases.length > 0) {
-        //                 purchaseDetailsContainer.innerHTML = '';
+        function showPurchases(phoneNumber) {
+            const purchasesRow = document.getElementById('purchases_' + phoneNumber);
+            const purchaseDetailsContainer = document.getElementById('purchaseDetails_' + phoneNumber);
+            axios.get(`/shop/products/report/${phoneNumber}`)
+                .then(function (response) {
+                    const data = response.data;
+                    if (data.purchases && data.purchases.length > 0) {
+                        purchaseDetailsContainer.innerHTML = '';
 
-        //                 data.purchases.forEach(function (purchase) {
-        //                     let productDetails = purchase.products.map(function (product) {
-        //                         return `${product.product_name} (x${product.count}) - ${product.total_price} руб`;
-        //                     }).join('<br>');
+                        data.purchases.forEach(function (purchase) {
+                            let productDetails = purchase.products.map(function (product) {
+                                return `${product.product_name} (x${product.count}) - ${product.total_price} руб`;
+                            }).join('<br>');
 
-        //                     let purchaseRow = `
-        //                         <tr>
-        //                             <td>${purchase.date}</td>
-        //                             <td>${purchase.full_price} руб</td>
-        //                             <td>${productDetails}</td>
-        //                         </tr>
-        //                     `;
-        //                     purchaseDetailsContainer.innerHTML += purchaseRow;
-        //                 });
+                            let purchaseRow = `
+                                <tr>
+                                    <td>${purchase.date}</td>
+                                    <td>${purchase.full_price} руб</td>
+                                    <td>${productDetails}</td>
+                                </tr>
+                            `;
+                            purchaseDetailsContainer.innerHTML += purchaseRow;
+                        });
 
-        //                 purchasesRow.style.display = 'table-row'; // Показать строку с покупками
-        //             } else {
-        //                 alert('Нет данных о покупках для этого покупателя');
-        //             }
-        //         })
-        //         .catch(function (error) {
-        //             console.error('Ошибка при получении покупок:', error);
-        //             alert('Произошла ошибка при получении данных');
-        //         });
-        // }
+                        purchasesRow.style.display = 'table-row'; // Показать строку с покупками
+                    } else {
+                        alert('Нет данных о покупках для этого покупателя');
+                    }
+                })
+                .catch(function (error) {
+                    console.error('Ошибка при получении покупок:', error);
+                    alert('Произошла ошибка при получении данных');
+                });
+        }
 
         document.getElementById('reportForm').addEventListener('submit', function (event) {
             event.preventDefault();

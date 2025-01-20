@@ -3,6 +3,7 @@ from fastapi.security import HTTPAuthorizationCredentials
 from fastapi.requests import Request
 
 from services.admin_token import AdminService
+from services.buyers import BuyersService
 from fastapi.templating import Jinja2Templates
 from models.purchase import Purchase
 from services.purchase import PurchaseService
@@ -84,8 +85,9 @@ async def get_report(
 @router.get("/report_page")
 async def get_report_page(
     request: Request,
-    service: PurchaseService = Depends(),
+    service: BuyersService = Depends(),
     admin_service: AdminService = Depends()
 ):
     t = admin_service.get_cooks_and_check_is_admin(request=request)
-    return template.TemplateResponse("report.html", {"request": request})
+    buyers = await service.get_list(t)
+    return template.TemplateResponse("report.html", {"request": request, "buyers" : buyers})
