@@ -36,7 +36,7 @@
                 <!-- Верхний правый угол -->
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div class="d-flex">
-                        <a href="/shop/products/admin_page" class="btn btn-info nav-button">Начальная страница</a>
+                        <a href="/shop/products/admin_page" class="btn btn-info nav-button">Начальная</a>
                         <a href="/shop/products/purchase_page" class="btn btn-secondary nav-button ml-2">Покупки</a>
                         <a href="/shop/products/report_page" class="btn btn-secondary nav-button ml-2">Составить отчет о покупках</a>
                     </div>
@@ -71,7 +71,7 @@
                                         <tr>
                                             <th>Дата</th>
                                             <th>Цена</th>
-                                            <th>Продукты</th>
+                                            <th>Товары</th>
                                         </tr>
                                     </thead>
                                     <tbody id="purchaseDetails_{{ buyer.telephone_number }}"></tbody>
@@ -141,7 +141,7 @@
                 })
                 .catch(function (error) {
                     console.error('Ошибка при получении покупок:', error);
-                    alert('Произошла ошибка при получении данных');
+                    alert("У покупателя нет покупок");
                 });
         }
 
@@ -170,7 +170,7 @@
                                 <li>
                                     <strong>Дата:</strong> ${purchase.date} <br>
                                     <strong>Полная цена:</strong> ${purchase.full_price} руб <br>
-                                    <strong>Продукты:</strong>
+                                    <strong>Товары:</strong>
                                     <ul>
                             `;
 
@@ -189,7 +189,7 @@
                         reportContainer.style.display = 'block';
                     })
                     .catch(function (error) {
-                        alert(error.data.message);
+                        alert("У данного пользователя нет покупок либо пользователя несуществует");
                     });
             } else {
                 alert('Пожалуйста, введите номер телефона');
