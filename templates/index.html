@@ -203,7 +203,7 @@ async function submitRegisterForm() {
     const middleName = document.getElementById('registerMiddleName').value;
 
     try {
-        const response = await axios.post('/shop/buyers/buyer/add', {
+        const response = await axios.post('/shop/products/buyer/add', {
             telephone_number:phone,
             surname:lastName,
             firstname:firstName,
