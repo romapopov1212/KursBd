@@ -18,7 +18,7 @@
                     <a href="#" class="btn btn-primary" onclick="openAdminLoginForm(event)">Войти как администратор</a>
                 </div>
                 <!-- СПИСОК ПОКУПОК -->
-                <h1 class="text-center mb-4">Список всех продуктов</h1>
+                <h1 class="text-center mb-4">Список всех товаров</h1>
                 <table class="table table-striped text-center">
                     <thead>
                         <tr>
@@ -48,22 +48,22 @@
         </div>
         <!-- ПОИСК ПО НАЗВАНИЮ -->
         <div class="mb-4">
-            <h2>Поиск продукта по названию</h2>
+            <h2>Поиск товара по названию</h2>
             <form id="searchByNameForm">
                 <div class="form-group">
-                    <label for="productName">Название продукта:</label>
-                    <input type="text" class="form-control" id="productName" placeholder="Введите название продукта">
+                    <label for="productName">Название товара:</label>
+                    <input type="text" class="form-control" id="productName" placeholder="Введите название товара">
                 </div>
                 <button type="submit" class="btn btn-primary">Искать</button>
             </form>
         </div>
         <!-- ПОИСК ПО id -->
         <div class="mb-4">
-            <h2>Поиск продукта по ID</h2>
+            <h2>Поиск товара по ID</h2>
             <form id="searchByIdForm">
                 <div class="form-group">
-                    <label for="productId">ID продукта:</label>
-                    <input type="number" class="form-control" id="productId" placeholder="Введите ID продукта">
+                    <label for="productId">ID товара:</label>
+                    <input type="number" class="form-control" id="productId" placeholder="Введите ID товара">
                 </div>
                 <button type="submit" class="btn btn-primary">Искать</button>
             </form>
@@ -161,8 +161,8 @@
                             <div id="productFieldsContainer">
                                 <div class="product-group">
                                     <div class="form-group">
-                                        <label>ID продукта</label>
-                                        <input type="number" class="form-control product-id" placeholder="Введите ID продукта">
+                                        <label>ID товара</label>
+                                        <input type="number" class="form-control product-id" placeholder="Введите ID товара">
                                     </div>
                                     <div class="form-group">
                                         <label>Количество</label>
@@ -218,7 +218,7 @@ async function submitRegisterForm() {
         }
     } catch (error) {
         const errorMessage = error.response?.data?.detail || error.message;
-        alert(`Ошибка регистрации: ${errorMessage}`);
+        alert(`Ошибка регистрации`);
     }
 }
 
@@ -294,7 +294,7 @@ function addProductFields() {
     productGroup.innerHTML = `
         <div class="form-group">
             <label>ID продукта</label>
-            <input type="number" class="form-control product-id" placeholder="Введите ID продукта">
+            <input type="number" class="form-control product-id" placeholder="Введите ID товара">
         </div>
         <div class="form-group">
             <label>Количество</label>

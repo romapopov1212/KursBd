@@ -11,3 +11,9 @@ class Buyers(BaseModel):
         if not v.startswith('8') or not v[1:].isdigit() or len(v) != 11:
             raise ValueError("Номер телефона должен начинаться с '8' и содержать 11 цифр")
         return v
+    
+    @field_validator("firstname", "surname", "lastname")
+    def validate_names(cls, v, field):
+        if not v.isalpha():
+            raise ValueError("Некорректное ФИО")
+        return v

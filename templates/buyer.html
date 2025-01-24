@@ -187,11 +187,11 @@
         const lastname = document.getElementById('customerMiddleName').value;
 
         try {
-            await axios.post('/shop/buyers/buyer/add', { telephone_number, firstname, surname, lastname });
+            await axios.post('/shop/products/buyer/add', { telephone_number, firstname, surname, lastname });
             alert('Покупатель успешно добавлен!');
             location.reload();
         } catch (error) {
-            alert('Ошибка добавления покупателя: ' + (error.response?.data?.detail || error.message));
+            alert('Ошибка добавления покупателя');
         }
     });
 
@@ -204,7 +204,7 @@
             alert(response.data.message);
             location.reload();
         } catch (error) {
-            alert('Ошибка удаления продукта: ' + (error.response?.data?.detail || error.message));
+            alert('Ошибка удаления покупателя: ' + (error.response?.data?.detail || error.message));
         }
     });
 
